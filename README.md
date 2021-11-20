@@ -53,17 +53,18 @@ As you can see this is a list of Market change in the time (pt is published time
 As you can see there are two types of data:
 * BASIC
 * ADVANCED
+
 Both contain the same information, but ADVANCED has updates every second and complex odds data (time, odds, traded volume, available to bet) while BASIC has updates every minute and the only odds information is time and last traded.
 
 
-the raw data folder  is 
-[Raw data ADVANCED](https://github.com/marcoselva/dataConversionFiverr/tree/main/rawData/ADVANCED)
-[Raw data BASIC](https://github.com/marcoselva/dataConversionFiverr/tree/main/rawData/BASIC)
+The raw data folder  is 
+* [Raw data ADVANCED](https://github.com/marcoselva/dataConversionFiverr/tree/main/rawData/ADVANCED)
+* [Raw data BASIC](https://github.com/marcoselva/dataConversionFiverr/tree/main/rawData/BASIC)
 
 each folder contains subfolder
-/TENNIS
-/SOCCER
-/HORSE RACING
+* /TENNIS
+* /SOCCER
+* /HORSE RACING
 
 The purpose of the code to be created would be to be able to interpret both types of data, and automatically determine whether it is ADVANCED or BASIC
 Then create in the db the occurrences found and then define for that market UNIQUE:
