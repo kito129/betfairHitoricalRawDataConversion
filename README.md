@@ -1166,7 +1166,7 @@ Now that the markert JSON is complete we can save that in `code/exportOutput/mar
 * `code/exportOutput/markets/BASIC/SOCCER`
 * `code/exportOutput/markets/BASIC/TENNIS`
 * `code/exportOutput/markets/BASIC/HORSE RACING`
-
+----------------------------
 * `code/exportOutput/markets/ADVANCED/SOCCER`
 * `code/exportOutput/markets/ADVANCED/TENNIS`
 * `code/exportOutput/markets/ADVANCED/HORSE RACING`
