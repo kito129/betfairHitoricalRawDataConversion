@@ -557,25 +557,26 @@ Now the object is complete, it's the time to improve runners data based on odds 
 
 With this code i save this info about the runners
 
-runners['inPlayOdds']: the first odds (ltp values) after the market is inPlay (first runners odds after openDate time)
-runners['inPlayIndex']: the first odds (ltp values) after the market is inPlay (the index in odds array)
-runners['inPlayTime']: the first odds timestamp (ltp values) after the market is inPlay (the first timestamp for this runner after openDate )
-runners['lengthOdds']: the total lenght of the odds array
-runners['lengthOddsPrematch']: the total lenght of the odds before the openDate
-runners['lengthOddsInPlay']: the total lenght of the odds from the openDate to the market CLOSE
-runners['closedOdds']: the last odds (ltp values) for the runner
-runners['avgPrematch']: the average odds before openDate
-runners['maxPrematch']: the max odds reached (ltp values) by the runner before the openDate time
-runners['minPrematch']: the min odds reached (ltp values) by the runner before the openDate time
-runners['maxInPlay']: the max odds reached (ltp values) by the runner after the openDate time
-runners['minInPlay']: the min odds reached (ltp values) by the runner after the openDate time
 
+* runners['inPlayOdds']: the first odds (ltp values) after the market is inPlay (first runners odds after openDate time)
+* runners['inPlayIndex']: the first odds (ltp values) after the market is inPlay (the index in odds array)
+* runners['inPlayTime']: the first odds timestamp (ltp values) after the market is inPlay (the first timestamp for this runner after openDate )
+* runners['lengthOdds']: the total lenght of the odds array
+* runners['lengthOddsPrematch']: the total lenght of the odds before the openDate
+* runners['lengthOddsInPlay']: the total lenght of the odds from the openDate to the market CLOSE
+* runners['closedOdds']: the last odds (ltp values) for the runner
+* runners['avgPrematch']: the average odds before openDate
+* runners['maxPrematch']: the max odds reached (ltp values) by the runner before the openDate time
+* runners['minPrematch']: the min odds reached (ltp values) by the runner before the openDate time
+* runners['maxInPlay']: the max odds reached (ltp values) by the runner after the openDate time
+* runners['minInPlay']: the min odds reached (ltp values) by the runner after the openDate time
 ### Volume  info for ADVANCED
 
 if status == 'ADVANCED': // only for advanced data
-  runners['tradedVolume']: the total traded volume on this runner (should be the last chronological "tv" volume)
-  runners['preMatchVolume']: the total traded volume on this runner before the open date
-  runners['inPlayVolume']: the total traded volume on this runner from the open date to the end CLOSE of the market
+
+* runners['tradedVolume']: the total traded volume on this runner (should be the last chronological "tv" volume)
+* runners['preMatchVolume']: the total traded volume on this runner before the open date
+* runners['inPlayVolume']: the total traded volume on this runner from the open date to the end CLOSE of the market
 
 
 ```python
