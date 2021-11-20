@@ -11,9 +11,9 @@
 
 ## Raw Data definition
 
-* [Betfair Docs](https://github.com/marcoselva/BFplatform/blob/main/01_dbCreation/Betfair-Historical-Data-Feed-Specification.pdf)
+* [Betfair Docs](https://github.com/marcoselva/dataConversionFiverr/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
 
-The database on which we will operate will be purchased from betfair exchange and will include all the matches on the platform, with information about 
+The database on which we will operate will be purchased from Betfair exchange and will include all the matches on the platform, with information about:
 * The event information
 * The market updates (event open, inPlay, closed..).
 * The runners (the competitors of the event) 
