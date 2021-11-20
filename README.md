@@ -19,9 +19,13 @@ The database on which we will operate will be purchased from Betfair exchange an
 * The runners (the competitors of the event) 
 * The odds (price, volume and available prices).
 
+* Additionla information ( such as final result, bookmaker odds and some stats) that will be add over a 
+
+
+
 This is a sample of market Djokovic v Medvedev of 12/09/2021
 
-[`sampleADVANCED.json`](https://github.com/marcoselva/BFplatform/blob/main/01_dbCreation/rawData/sampleADVANCED.json)
+[`1.187528277.bz2.json`](https://github.com/marcoselva/dataConversionFiverr/blob/main/sample/input/1.187528277.bz2.json)
 
 As you can see this is a list of Market change in the time (pt is published time), and the main propose is to convert this time data in
 * A single version of market info (event, name, time, open date and all info about the market) -> from now on we will call it <b> MarketInfo</b>
