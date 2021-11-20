@@ -213,7 +213,7 @@ have "mc" props and not "rc" inside
         "turnInPlayEnabled": true,
         "persistenceEnabled": true,
         "marketBaseRate": 5.0,
-        "eventId": "30891863",
+        "eventId": 30891863,
         "eventTypeId": "2",
         "numberOfWinners": 1,
         "bettingType": "ODDS",
@@ -705,7 +705,7 @@ After this pass we should save this info in runner and now the runners info look
 {
   "info": {
     "id": "1.187528277",
-    "eventId": "30891863",
+    "eventId": 30891863,
     "eventName": "Match Odds",
     "marketType": "MATCH_ODDS",
     "openDate": 1631477833160,
@@ -856,7 +856,308 @@ After this pass we should save this info in runner and now the runners info look
 }
 ```
 
-## 4- check and save JSOn
+## 4- Additional data
+
+As i said now the market info from betfair is complete but in order to have a compelte DB we have to add some info form this file
+
+TENNIS: 
+[TENNIS ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
+[TENNIS ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
+
+
+
+SOCCER:
+[SOCCER ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
+[SOCCER ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
+
+FOR HORSE: no additional info
+
+The task should check in the excel or csv file if the market is present (it's possible that not exist in excel Db)
+looking by marketName, runner name and date.
+
+After found the correct line in excle/csv we should add this data in the market info.
+
+NB: I didn't make this part in my code, you have to start from 0. 
+I can suggest you to search in excel the name of the runners in the columns together with the date (a market with 2 same runners and same date is unique) and then copy the columns you find in notes.txt
+chronological
+
+
+at end of this proces the complete file should look like this (odds part are ommised)
+
+```json
+
+{
+  "info": {
+    "id": "1.187528277",
+    "eventId": 30891863,
+    "eventName": "Match Odds",
+    "marketType": "MATCH_ODDS",
+    "openDate": 1631477833160,
+    "name": "Djokovic v Medvedev",
+    "numberOfActiveRunner": 2,
+    "countryCode": "US",
+    "sport": "TENNIS",
+    "venue": "",
+    "volume": {
+      "total": 11825068.38,
+      "preMatch": 1852569.96,
+      "inPlay": 9972498.42
+    },
+    "winner": {
+      "id": 19924831,
+      "name": "Daniil Medvedev",
+      "status": "WINNER",
+      "position": 2
+    },
+    "delay": 3
+  },
+  "runners": [
+    {
+      "id": 2249229,
+      "name": "Novak Djokovic",
+      "status": "LOSER",
+      "position": 1,
+      "inPlayOdds": 1.44,
+      "inPlayTime": 1631477833160,
+      "avgPrematch": 1.42,
+      "closedOdds": 19.0,
+      "maxPrematch": 1.44,
+      "minPrematch": 1.38,
+      "maxInPlay": 120.0,
+      "minInPlay": 1.41,
+      "inPlayIndex": 4532,
+      "lengthOdds": 12014,
+      "lengthOddsPrematch": 4532,
+      "lengthOddsInPlay": 7482,
+      "tradedVolume": 4302965.3,
+      "preMatchVolume": 1578301.23,
+      "inPlayVolume": 2724664.07
+    },
+    {
+      "id": 19924831,
+      "name": "Daniil Medvedev",
+      "status": "WINNER",
+      "position": 2,
+      "inPlayOdds": 3.3,
+      "inPlayTime": 1631477833160,
+      "avgPrematch": 3.34,
+      "closedOdds": 1.01,
+      "maxPrematch": 3.55,
+      "minPrematch": 3.25,
+      "maxInPlay": 3.45,
+      "minInPlay": 1.01,
+      "inPlayIndex": 3013,
+      "lengthOdds": 10613,
+      "lengthOddsPrematch": 3013,
+      "lengthOddsInPlay": 7600,
+      "tradedVolume": 7522103.08,
+      "preMatchVolume": 274268.73,
+      "inPlayVolume": 7247834.35
+    }
+  ],
+  "marketUpdates": [
+    {
+      "timestamp": 1631330837213000000,
+      "openDate": "2021-09-12T15:00:00.000Z",
+      "status": "OPEN",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631334824468000000,
+      "openDate": "2021-09-12T20:00:00.000Z",
+      "status": "OPEN",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631339930202000000,
+      "openDate": "2021-09-12T20:00:00.000Z",
+      "status": "SUSPENDED",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631339939435000000,
+      "openDate": "2021-09-12T20:00:00.000Z",
+      "status": "OPEN",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631476915685000000,
+      "openDate": "2021-09-12T20:15:00.000Z",
+      "status": "OPEN",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631477521419000000,
+      "openDate": "2021-09-12T20:08:00.000Z",
+      "status": "OPEN",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631477832479000000,
+      "openDate": "2021-09-12T20:08:00.000Z",
+      "status": "SUSPENDED",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631477833160000000,
+      "openDate": "2021-09-12T20:08:00.000Z",
+      "status": "OPEN",
+      "betDelay": 3,
+      "inPlay": true,
+      "complete": true
+    },
+    {
+      "timestamp": 1631486006482000000,
+      "openDate": "2021-09-12T20:08:00.000Z",
+      "status": "SUSPENDED",
+      "betDelay": 3,
+      "inPlay": true,
+      "complete": true
+    },
+    {
+      "timestamp": 1631486183103000000,
+      "openDate": "2021-09-12T20:08:00.000Z",
+      "status": "CLOSED",
+      "betDelay": 3,
+      "inPlay": true,
+      "complete": true
+    }
+  ],
+  "additionalInfo":{                                            // data added via excel
+      "tennis":{                                                // if is not tennis is null
+            "tennisTournament":{
+                "location":  "New York",                // columns B
+                "tournament":  "US Open",               // columns C
+                "series":  "Grand Slam",                // columns E
+                "court": "Outdoor",                     // columns F
+                "surface":  "Hard",                     // columns G
+                "round":   "The Final",                 // columns H
+                "bestOf":  5                           // columns I
+            },
+            "tennisRank": {
+                "winnerRank": 2,                       // columns L
+                "winnerPoint": 9980,                    // columns N
+                "loserRank":  1,                       // columns M
+                "loserPoint": 11113                    // columns O
+            },
+            "finalResult":{
+                "winner": {
+                    "s1": 6,                           // columns P
+                    "s2": 6,                           // columns R
+                    "s3": 6,                           // columns T
+                    "s4": null,                        // columns V
+                    "s5": null,                        // columns X
+                    "totalSet": 3                      // columns Z
+                },
+                "loser": {
+                    "s1": 4,                           // columns Q
+                    "s2": 4,                           // columns S
+                    "s3": 4,                           // columns U
+                    "s4": null,                        // columns W
+                    "s5": null,                        // columns Y
+                    "totalSet": 0                       // columns AA
+                },
+                "comment": "Completed"                   // columns AB
+            },
+             "bookOdds": {
+                "bet365":{
+                    "winner": 1.4,                         // columns AC
+                    "loser": 3,                            // columns AD
+                },
+                "pinnacle":{
+                    "winner": 1.42,                        // columns AE
+                    "loser": 3.14,                         // columns AF
+                },
+                "maxOddsPortal": {
+                    "winner": 1.45,                        // columns AG
+                    "loser": 3.36,                         // columns AH
+                },
+                "avgOddsPortal": {
+                    "winner": 1.39,                        // columns AI
+                    "loser": 4,                            // columns AJ
+                }
+            }
+      },
+      "football":{                                     // if is not football is null, this data is based on Inter v Genoa -21/08/2021
+            "finalResult":{
+                "home": {
+                    "fthg": 4,                         // Full Time Home Team Goals -  columns F
+                    "hthg": 2,                         // Half Time Home Team Goals -  columns I
+                },
+                "away": {
+                    "ftag": 0,                         // Full Time Away Team Goals -  columns G
+                    "htag": 0,                         // Half Time Away Team Goals -  columns J
+                },
+                "ftr": "H",                              // Full Time Result (H=Home Win, D=Draw, A=Away Win) - columns H
+                "htr": "H"                               // Half Time Result (H=Home Win, D=Draw, A=Away Win) - columns K
+            },
+            "matchStats": {
+                "hs": 17,                               // Home Team Shots - columns L
+                "as": 11,                               // Away Team Shots - columns M
+                "hst": 8,                               // Home Team Shots on Target - columns N
+                "ast": 5,                               // Away Team Shots on Target - columns O
+                "hhw": null,                            // Home Team Hit Woodwork - columns --
+                "ahw": null,                            // Away Team Hit Woodwork - columns --
+                "hc": 8,                                // Home Team Corners - columns R
+                "ac": 2,                                // Away Team Corners - columns S
+                "hf": 18,                               // Home Team Fouls Committed - columns P
+                "af": 7,                                // Away Team Fouls Committed - columns Q
+                "hfkc": null,                           // Home Team Free Kicks Conceded - columns --
+                "afkc": null,                           // Away Team Free Kicks Conceded - columns --
+                "ho": null,                             // Home Team Offsides - columns --
+                "ao": null,                             // Away Team Offsides - columns --
+                "hy": 1,                                // Home Team Yellow Cards - columns T
+                "ay": 3,                                // Away Team Yellow Cards - columns U
+                "hr": 0,                                // Home Team Red Cards - columns V
+                "ar": 0,                                // Away Team Red Cards - columns W
+
+            },
+             "bookOdds": {
+                "bet365":{
+                    "matchOdds": {
+                        "home": 1.33,                         // B365H - columns X
+                        "draw": 5.25,                         // B365D - columns Y
+                        "away": 9,                           //  B365A - columns Z
+                    },
+                    "uo25": {
+                        "under25": 2.2,                       //B365<2.5 -  columns AW
+                        "over25": 1.66,                       //B365>2.5 - columns AV
+                    }
+                },
+                "pinnacle":{
+                    "matchOdds": {
+                        "home": 1.36,                         // PSH - columns AG
+                        "draw": 5.37,                         // PSD - columns AH
+                        "away": 9.65,                         // PSA - columns AHI
+                    },
+                    "uo25": {
+                        "under25": 2.33,                       // P<2.5 - columns AX
+                        "over25": 1.67,                        // P>2.5 - columns AY
+                    }
+                }
+            }
+      },
+  },
+}
+
+
+```
+
+## 5- check and save JSON
 
 Now we should check that the json file is correct and consistent.
 Now that the markert JSON is complete we can save that in `code/exportOutput/markets` (for the moment it save all togheter but we can mantain the original path, so divided by sport and types)
@@ -870,7 +1171,7 @@ Now that the markert JSON is complete we can save that in `code/exportOutput/mar
 `code/exportOutput/markets/ADVANCED/TENNIS`
 `code/exportOutput/markets/ADVANCED/HORSE RACING`
 
-## 5- check and generate RunnerDB
+## 6- check and generate RunnerDB
 
 We should start to generate the runnersDB JSON.
 
