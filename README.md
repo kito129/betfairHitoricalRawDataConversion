@@ -209,7 +209,7 @@ Now start the real conversion task.
 The market type list you should use
 
 |    | marketType               |      eventName |      sport |      note |      nOfRunners |
-|---:|:---------------------------|:--------|:--------|:--------|
+|---:|---------------------------:|--------:|--------:|--------:|
 |  1 | WIN | WIN | HORSE RACING | winner of the race | typical 2 ore more runners |
 |  2 | BOTH_TEAMS_TO_SCORE | WIN | SOCCER | both teams score at least one goal | 2 runners: YES, NO |
 |  3 | HALF_TIME | WIN | SOCCER | half time result | 3 runner, 2 team and THE DRAW |
