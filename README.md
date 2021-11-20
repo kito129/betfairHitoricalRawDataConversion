@@ -33,9 +33,9 @@ The database on which we will operate will be purchased from Betfair exchange an
 * The runners (the competitors of the event) 
 * The odds (price, volume and available prices).
 
-* Additional data information ( such as final result, bookmaker odds and some stats) that will be add over a 
-[Soccer Additional Data](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/SOCCER)
-[Tennis Additional Data](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/TENNIS)
+Additional data information ( such as final result, bookmaker odds and some stats) that will be add over a 
+* [Soccer Additional Data](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/SOCCER)
+* [Tennis Additional Data](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/TENNIS)
 
 
 This is a sample of market Djokovic v Medvedev of 12/09/2021
