@@ -858,19 +858,19 @@ After this pass we should save this info in runner and now the runners info look
 
 ## 4- Additional data
 
-As i said now the market info from betfair is complete but in order to have a compelte DB we have to add some info form this file
+As i said now the market info from betfair is complete, but in order to have a complete DB we have to add some info form this file
 
 TENNIS: 
-[TENNIS ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
-[TENNIS ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
-
+  [TENNIS ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/TENNIS)
+  [TENNIS ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/excel/TennisNotes.txt)
 
 
 SOCCER:
-[SOCCER ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
-[SOCCER ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
+  [SOCCER ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/SOCCER)
+  [SOCCER ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/excel/SoccerNotes.txt)
 
-FOR HORSE: no additional info
+HORSE: 
+  no additional info
 
 The task should check in the excel or csv file if the market is present (it's possible that not exist in excel Db)
 looking by marketName, runner name and date.
