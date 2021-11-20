@@ -77,7 +77,7 @@ def main(rawDataPath, workPath, dataType):
 
     pprint.pprint('N OF CORRECT OBJECT: ' + str(marketCounter))
 
-        # save Market as JSON
+    # save Market as JSON
     for _market in marketList:
         utils.saveMarketJSON(_market)
 

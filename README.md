@@ -20,17 +20,14 @@ The database on which we will operate will be purchased from Betfair exchange an
 * The odds (price, volume and available prices).
 
 * Additional data information ( such as final result, bookmaker odds and some stats) that will be add over a 
-
-[Soccer Additional Data](https://github.com/marcoselva/dataConversionFiverr/blob/main/sample/input/1.187528277.bz2.json)
-[Tennis Additional Data](https://github.com/marcoselva/dataConversionFiverr/blob/main/sample/input/1.187528277.bz2.json)
-
-
-
+[Soccer Additional Data](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/SOCCER)
+[Tennis Additional Data](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/TENNIS)
 
 
 This is a sample of market Djokovic v Medvedev of 12/09/2021
 
 [`1.187528277.bz2.json`](https://github.com/marcoselva/dataConversionFiverr/blob/main/sample/input/1.187528277.bz2.json)
+
 
 As you can see this is a list of Market change in the time (pt is published time), and the main propose is to convert this time data in
 * A single version of market info (event, name, time, open date and all info about the market) -> from now on we will call it <b> MarketInfo</b>
@@ -43,6 +40,16 @@ As you can see there are two types of data:
 * BASIC
 * ADVANCED
 Both contain the same information, but ADVANCED has updates every second and complex odds data (time, odds, traded volume, available to bet) while BASIC has updates every minute and the only odds information is time and last traded.
+
+
+the raw data folder  is 
+[Raw data ADVANCED](https://github.com/marcoselva/dataConversionFiverr/tree/main/rawData/ADVANCED)
+[Raw data BASIC](https://github.com/marcoselva/dataConversionFiverr/tree/main/rawData/BASIC)
+
+each folder contains subfolder
+/TENNIS
+/SOCCER
+/HORSE RACING
 
 The purpose of the code to be created would be to be able to interpret both types of data, and automatically determine whether it is ADVANCED or BASIC
 Then create in the db the occurrences found and then define for that market UNIQUE:
@@ -60,10 +67,11 @@ While two separate enities for
 
 So as to be able to search for events and selections in a unique way, and then display, according to availability, only BASIC, only ADVANCED or both types of data.
 
+# TASK
 
-## Download data and Extract principal ZIP
+## 1- Download data and Extract principal ZIP
 
-The first process to do is download the data form [Betfair](https://historicdata.betfair.com/#/home)
+The first process to do is to download the data form [Betfair](https://historicdata.betfair.com/#/home)
 This process includes purchase and authentication task, so i don't want to automate that process.
 
 I will provide you a sample of data to working about.
@@ -72,23 +80,57 @@ Then i will use for my self the code over all data to create my personal db.
 The code should be run once a day, as the data is released after 5 days from the end of the event.
 So this code will need to be run once a day to add the newly downloaded markets to the DB.
 
-## Extract All market
+Every day i will place the data in the /rawData folder and start the code.
+
+
+
+## 2- Extract All market
+
+The current code start with placing the correct folder to analyze in the path (we fix to convert all path in the same time)
+`code/routine.py` 
+
+```bash
+  python routine.py
+```
+
+
+```python
+
+# the path were al files are extracte, you have to sperate file extracted by sport and by type of data
+workPath = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/code/rawInput/'
+
+# the path were i will place the file to be converted
+data_ADVANCED_SOCCER = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/ADVANCED/SOCCER/'
+data_ADVANCED_TENNIS = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/ADVANCED/TENNIS/'
+data_ADVANCED_HORSE_RACING = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/ADVANCED/HORSE RACING/'
+
+data_BASIC_SOCCER = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/BASIC/SOCCER/'
+data_BASIC_TENNIS = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/BASIC/TENNIS/'
+data_BASIC_HORSE_RACING = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/BASIC/HORSE RACING/'
+
+# have to run for all above folder
+
+# start the routine
+main.main(data_BASIC_HORSE_RACING,workPath,'BASIC')
+
+```
+
 
 The situation before starting the code would be:
 
 I put all the .bz2 archive in this folders
 
-`dataToAdd/BASIC/football/`
-`dataToAdd/BASIC/tennis/`
-`dataToAdd/BASIC/horseracing/`
+`rawData/BASIC/SOCCER/`
+`rawData/BASIC/TENNIS/`
+`rawData/BASIC/HORSE RACING/`
 
-`dataToAdd/ADVANCED/football/`
-`dataToAdd/ADVANCED/tennis/`
-`dataToAdd/ADVANCED/horseracing/`
+`rawData/ADVANCED/SOCCER/`
+`rawData/ADVANCED/TENNIS/`
+`rawData/ADVANCED/HORSE RACING/`
 
 From here we hould extract the bz2 and save as json
 
-I created this code, that you have to fix
+I created this code, that you have to fix and imporve with sport differentiation and type too (BASIC / ADVANCED)
 
 ```python
 # ##
@@ -102,13 +144,11 @@ import json
 # loop on all folder in path and extract bz2 to JSON file
 def extractJson(dataPath, extractPath):
     print("\nExtracting File...")
-    countFile = 0
     countOK = 0
     for (dirpath, dirnames, files) in os.walk(dataPath):
         for fileName in files:
             # filter out decompressed files
             if fileName.endswith('.json'):
-                countFile = countFile + 1
                 continue
 
             # save file as .json
@@ -118,47 +158,47 @@ def extractJson(dataPath, extractPath):
 
             # save JSON file
             with open(newFilepath, 'wb') as new_file, bz2.BZ2File(filepath, 'rb') as file:
-                countOK = countOK + 1
                 for data in iter(lambda: file.read(), b''):
                     new_file.write(data)
             file.close()
             countOK = countOK +1
 
     # print recap
-    print("File to extract: " + str(countFile))
-    print("OK Extracted: " + str(countOK))
+    print("Files Extracted: " + str(countOK))
     print('\nEnd of extraction..\n')
-
-
 ```
 
 At the end of this process we could have a folder ( at the moment i didn't implement the sport division)
 
-`pythonCode/historicJSON/BASIC/football/`
-`pythonCode/historicJSON/BASIC/tennis/`
-`pythonCode/historicJSON/BASIC/horseracing/`
+`code/rawInput/BASIC/SOCCER/`
+`code/rawInput/BASIC/TENNIS/`
+`code/rawInput/BASIC/HORSE RACING/`
 
-`pythonCode/historicJSON/ADVANCED/football/`
-`pythonCode/historicJSON/ADVANCED/tennis/`
-`pythonCode/historicJSON/ADVANCED/horseracing/`
+`code/rawInput/ADVANCED/SOCCER/`
+`code/rawInput/ADVANCED/TENNIS/`
+`code/rawInput/ADVANCED/HORSE RACING/`
 
-contains all data convertet to JSON
+contains all raw archive data convertet to correct JSON format
 
-In a folder all market downloaded and converted in correct JSON, as: `1.187528277_ADVANCED.json` or `1.187528277_BASIC.json`
-the current code save the file without BASIC or ADVANCED prefix and  we should change that in order to analyze at the same time both ADVANCED and BASIC markets (they have the same market ID so they are separated)
+the current code save the file without BASIC or ADVANCED prefix and without sport differentiation. We should change that in order to analyze at the same time both ADVANCED and BASIC markets (they have the same market ID so they are separated)
  
-## Convert to JSONv1
+## 3- Convert to JSONv1
 
 Now start the real conversion task.
 
-`pythonCode/dataframe.py` is were i placed the code that made this division and create an object like this
 
 
-First in my version i convert this `1.1.187528277_ADVANCED.json` to a panda dataframe in order to separate all lines and save the pt (publish time in milliseconds UTC)
+### Panda dataframe and line separation
+`code/dataframe.py` is were i placed the code that made this division and create an object like this
+
+
+First in my version i convert this `1.1.187528277.json` to a panda dataframe in order to separate all lines and save the pt (publish time in milliseconds UTC)
 
 There will be 2 different types of line
 
-MARKET UPDATE
+MARKET CHANGES
+
+have "mc" props and not "rc" inside
 
 ```json
 {
@@ -218,6 +258,9 @@ MARKET UPDATE
 }
   ```
 ODDS UPDATE
+
+have "mc" props and "rc" props inside
+
 ```json
 {
   "op": "mcm",
@@ -272,7 +315,7 @@ mainObj = {
 
   This is an example of data contained
 
-`mainObj['market"]`
+`mainObj['market']`
 
 |    | publish_time               |      id |   eventId | marketType   | openDate                 | status    | eventName           | name       |   betDelay | inPlay   | complete   |   numberOfActiveRunners |    version |
 |---:|:---------------------------|--------:|----------:|:-------------|:-------------------------|:----------|:--------------------|:-----------|-----------:|:---------|:-----------|------------------------:|-----------:|
@@ -351,7 +394,7 @@ mainObj = {
 
 NOTE: for market update we should remove the identical update (line with no changes except "version" value )
 
-this is my code to that
+this is my code to that (to imporve and fix=
 ```python
 # remove similar line 
 newUpdate = []
@@ -366,9 +409,6 @@ for index, elem in enumerate(self.marketUpdates):
 
 self.marketUpdates = newUpdate
 ```
-
-
-
 
 So for this file we should have this 
 
@@ -396,7 +436,7 @@ So for this file we should have this
 | 141 | WINNER   | 19924831 | Daniil Medvedev |              2 |
 
 
-`mainObj['odds"]` // some lines are removed
+`mainObj['odds"]` // some lines are removed here to view
 
 
 |       | publish_time               |   runner_id | runner_name     |   odds |          tv | trd                                   | batb                                    | batl                                                            |   sortPriority |
@@ -431,31 +471,35 @@ So for this file we should have this
 | 22167 | 2021-09-12 22:23:23.617000 |     2249229 | Novak Djokovic |    100 | 4.28596e+06 | nan                                     | [[0, 55, 13.23], [1, 50, 1.71], [2, 48, 1.71]]    | [[2, 110, 10.63]]                              |              1 |
 
 
+### Panda dataframe to python object
+
 Now we have completed conversion from original file to panda dataframe
 
-Now at line 65 of `pythonCode/main.py` we should have this mainObj
+After that dataframe creation we should have this mainObj
 
+It's the moment to start to convert in python object
 
-It' the moment to start to convert in python object
-
-i pass this obj to convertToMyObject(dataframe, path, status) function tha is in `pythonCode/dfToObeject.py`
+i pass this obj to convertToMyObject(dataframe, path, status) function tha is in `code/dfToObeject.py`
 
 in this file i separate MarketInfo, MarketSelection, MarketUpdates, MarketPrices entities and i covert panda df to python obj
 
-at the line 35 of `pythonCode/dfToObeject.py` i start to create MarketInfo
+The class is defined in `code/object/markets.py` 
+The constructor take the dataframe and create a python object based on last market update
 
-The class is defined in `pythonCode/object/markets.py` 
-The constructor take the dataframe and create a python object based on last market update (line 18 in `pythonCode/object/markets.py`)
+I take into consideration the <b>last market changes update</b> to be sure to get the complete info (based on the fact that they are the info on which will be based the settlement of the market and then its closing)
 
-I take into consideration the last update to be sure to get the complete info (based on the fact that they are the info on which will be based the settlement of the market and then its closing)
 
-Now at line 51 we start with match update fix
+### Match updates fix (correct openDate)
+Now we start with match update fix
 
 In practice there is an "error" on the data reported by betfair. The starting time reported in the market update (openDate) is almost never correct to the thousandth because that value (openDate) is set according to the official time of, but then the match starts at a different time (sometimes we talk about a few seconds or minutes, while in other cases the deviation can be much larger.
 
-To correct this error there are two different ways:
+To correct this error
 
-1)
+```python
+    # fix start match error
+    mainMarket.fixUpdates()
+```
 
 |    | publish_time               |      id |   eventId | marketType   | openDate                 | status    | eventName           | name       |   betDelay | inPlay   | complete   |   numberOfActiveRunners |    version |
 |---:|:---------------------------|--------:|----------:|:-------------|:-------------------------|:----------|:--------------------|:-----------|-----------:|:---------|:-----------|------------------------:|-----------:|
@@ -471,13 +515,11 @@ To correct this error there are two different ways:
 | 70 | 2021-09-12 22:36:23.103000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | CLOSED    | Djokovic v Medvedev | Match Odds |          3 | True     | True       |                       0 | 4029887210 |
 
 
-
-like here as you can see betfair report for open date  2021-09-12T20:08:00.000Z, but the correct in play time is 2021-09-12 20:17:13.160000, and we can find it iterating over the marketUpdate array and stopping the search when these conditions are all true:
+like here as you can see betfair report for open date 2021-09-12T20:08:00.000Z, but the correct in play time is 2021-09-12 20:17:13.160000, and we can find it iterating over the marketUpdate array and stopping the search when these conditions are all true:
 
 * status = OPEN
 * inPlay = TRUE
 * betDelay > 0
-
 
 something  like this 
 ```python
@@ -489,15 +531,372 @@ for elem in self.marketUpdates:
         break
 ``` 
 
-Now we can save the info about betDelay
+### Removing some market
+Now we can save the info about correct openDate and the betDelay time
+
 There are some rule to remove / skip the market if betDelay are to high
 
 * Tennis --> remove if (betdelay >3 and open date > 2019)
 * Tennis --> remove if (betdelay >5 and open date < 2019)
-* Football --> remove if betdelay >7
+* Football --> remove if betdelay > 7
+
+And ONLY FOR TENNIS, we should remove match with "/" in event name (all doubles matches, that i don't want in my DB)
+* Tennis --> remove if eventName contains "/" or " / "
 
 
-at this stage the object looks like this
+### Improve runner info and odds information
+
+Now the object is complete, it's the time to improve runners data based on odds information.
+
+```python
+    # update updates with odds for the status
+    mainMarket.updateRunnersStats(status)
+```
+
+
+
+With this code i save this info about the runners
+
+runners['inPlayOdds']: the first odds (ltp values) after the market is inPlay (first runners odds after openDate time)
+runners['inPlayIndex']: the first odds (ltp values) after the market is inPlay (the index in odds array)
+runners['inPlayTime']: the first odds timestamp (ltp values) after the market is inPlay (the first timestamp for this runner after openDate )
+runners['lengthOdds']: the total lenght of the odds array
+runners['lengthOddsPrematch']: the total lenght of the odds before the openDate
+runners['lengthOddsInPlay']: the total lenght of the odds from the openDate to the market CLOSE
+runners['closedOdds']: the last odds (ltp values) for the runner
+runners['avgPrematch']: the average odds before openDate
+runners['maxPrematch']: the max odds reached (ltp values) by the runner before the openDate time
+runners['minPrematch']: the min odds reached (ltp values) by the runner before the openDate time
+runners['maxInPlay']: the max odds reached (ltp values) by the runner after the openDate time
+runners['minInPlay']: the min odds reached (ltp values) by the runner after the openDate time
+
+### Volume  info for ADVANCED
+
+if status == 'ADVANCED': // only for advanced data
+  runners['tradedVolume']: the total traded volume on this runner (should be the last chronological "tv" volume)
+  runners['preMatchVolume']: the total traded volume on this runner before the open date
+  runners['inPlayVolume']: the total traded volume on this runner from the open date to the end CLOSE of the market
+
+
+```python
+ # update odds for status in updates
+    def updateRunnersStats(self, status):
+
+        inPlay = self.info['openDate']
+        runners = self.runners
+        odds = self.odds
+
+        # find inplay for all runners
+        for run in runners:
+
+            sumPrematch = 0
+            stepCounter = 0
+            contPrematch = 0
+            maxPrematch = -100
+            minPrematch = 1001
+            maxInPlay = -100
+            minInPlay = 1001
+            found = False
+
+            # volume for runner
+            preMatchVolume = 0
+
+            # iterate over odds
+            for odd in odds:
+                if odd['runnerId'] == run['id']:
+                    # find inPlay index
+                    inPlayindex = int(self._find_inPlay_index(odd, inPlay))
+                    if len(odd['odds']) > 0 and inPlayindex > -1:
+                        for _odd in odd['odds']:
+                            # avg runner prematch odd
+                            if stepCounter < inPlayindex:
+                                # check if max prematch
+                                if _odd['ltp'] > maxPrematch:
+                                    maxPrematch = _odd['ltp']
+                                # check if min prematch
+                                if _odd['ltp'] < minPrematch:
+                                    minPrematch = _odd['ltp']
+                                # increment prematch counter
+                                sumPrematch = sumPrematch + _odd['ltp']
+                                contPrematch = contPrematch + 1
+
+                            elif stepCounter >= inPlayindex:
+                                # im in INPLAY
+                                # set the first inplay ltp as inPlayOdds
+                                if not found:
+                                    # volume for ADVANCED only (check volume)
+                                    if status == 'ADVANCED':
+                                        preMatchVolume = _odd['tv']
+                                    # inPlay time and odds
+                                    run['inPlayOdds'] = _odd['ltp']
+                                    run['inPlayTime'] = _odd['timestamp']
+                                    found = True
+                                # check if max inplay
+                                if _odd['ltp'] > maxInPlay:
+                                    maxInPlay = _odd['ltp']
+                                # check if min inplay
+                                if _odd['ltp'] < minInPlay:
+                                    minInPlay = _odd['ltp']
+                            # increment step counter
+                            stepCounter = stepCounter + 1
+                        # avg odds prematch 
+                        if contPrematch != 0:
+                            run['avgPrematch'] = round(sumPrematch / contPrematch,2)
+                        else:
+                            run['avgPrematch'] = 0
+                        # closed odds
+                        run['closedOdds'] = odd['odds'][len(odd['odds']) - 1]['ltp']
+                        # max and min prematch
+                        run['maxPrematch'] = maxPrematch
+                        run['minPrematch'] = minPrematch
+                        # max and min inPlay
+                        run['maxInPlay'] = maxInPlay
+                        run['minInPlay'] = minInPlay
+                        # odds metadata
+                        run['inPlayIndex'] = inPlayindex
+                        run['lengthOdds'] = stepCounter
+                        run['lengthOddsPrematch'] = contPrematch
+                        run['lengthOddsInPlay'] = stepCounter - contPrematch
+                        # volume for ADVANCED
+                        if status == 'ADVANCED':
+                            run['tradedVolume'] = round(odd['odds'][len(odd['odds']) - 1]['tv'],2)
+                            run['preMatchVolume'] = round(preMatchVolume,2)
+                            run['inPlayVolume'] = round(run['tradedVolume'] - preMatchVolume,2)
+                    # no odds for this runner
+                    else:
+                        run['inPlayOdds'] = 0
+                        run['openOdds'] = 0
+                        run['closedOdds'] = 0
+                        run['maxPrematch'] = 0
+                        run['minPrematch'] = 0
+                        run['maxInPlay'] = 0
+                        run['minInPlay'] = 0
+                        # volume for ADVANCED
+                        if status == 'ADVANCED':
+                            run['tradedVolume'] = 0
+                            run['preMatchVolume'] = 0
+                            run['inPlayVolume'] = 0
+
+    # update total market volume based on runner traded volume
+    def updateVolume(self):
+
+        for runnerVol in self.runners:
+            self.info['volume']['total'] = round(self.info['volume']['total'] +  runnerVol['tradedVolume'],2)
+            self.info['volume']['preMatch'] = round(self.info['volume']['preMatch'] +  runnerVol['preMatchVolume'],2)
+            self.info['volume']['inPlay'] = round(self.info['volume']['inPlay'] +  runnerVol['inPlayVolume'],2)
+
+    # find inPlay index for this runner
+    def _find_inPlay_index(self, runnerOdds, inPlayTime):
+
+        counter = 0
+        minCounter = -1
+        for value in runnerOdds['odds']:
+            if value['timestamp'] - inPlayTime >= 0:
+                minCounter = counter
+                break
+            counter = counter + 1
+        return minCounter
+```
+
+
+After this pass we should save this info in runner and now the runners info looks likes (odds are removed here)
+
+```json
+{
+  "info": {
+    "id": "1.187528277",
+    "eventId": "30891863",
+    "eventName": "Match Odds",
+    "marketType": "MATCH_ODDS",
+    "openDate": 1631477833160,
+    "name": "Djokovic v Medvedev",
+    "numberOfActiveRunner": 2,
+    "countryCode": "US",
+    "sport": "TENNIS",
+    "venue": "",
+    "volume": {
+      "total": 11825068.38,
+      "preMatch": 1852569.96,
+      "inPlay": 9972498.42
+    },
+    "winner": {
+      "id": 19924831,
+      "name": "Daniil Medvedev",
+      "status": "WINNER",
+      "position": 2
+    },
+    "delay": 3
+  },
+  "runners": [
+    {
+      "id": 2249229,
+      "name": "Novak Djokovic",
+      "status": "LOSER",
+      "position": 1,
+      "inPlayOdds": 1.44,
+      "inPlayTime": 1631477833160,
+      "avgPrematch": 1.42,
+      "closedOdds": 19.0,
+      "maxPrematch": 1.44,
+      "minPrematch": 1.38,
+      "maxInPlay": 120.0,
+      "minInPlay": 1.41,
+      "inPlayIndex": 4532,
+      "lengthOdds": 12014,
+      "lengthOddsPrematch": 4532,
+      "lengthOddsInPlay": 7482,
+      "tradedVolume": 4302965.3,
+      "preMatchVolume": 1578301.23,
+      "inPlayVolume": 2724664.07
+    },
+    {
+      "id": 19924831,
+      "name": "Daniil Medvedev",
+      "status": "WINNER",
+      "position": 2,
+      "inPlayOdds": 3.3,
+      "inPlayTime": 1631477833160,
+      "avgPrematch": 3.34,
+      "closedOdds": 1.01,
+      "maxPrematch": 3.55,
+      "minPrematch": 3.25,
+      "maxInPlay": 3.45,
+      "minInPlay": 1.01,
+      "inPlayIndex": 3013,
+      "lengthOdds": 10613,
+      "lengthOddsPrematch": 3013,
+      "lengthOddsInPlay": 7600,
+      "tradedVolume": 7522103.08,
+      "preMatchVolume": 274268.73,
+      "inPlayVolume": 7247834.35
+    }
+  ],
+  "marketUpdates": [
+    {
+      "timestamp": 1631330837213000000,
+      "openDate": "2021-09-12T15:00:00.000Z",
+      "status": "OPEN",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631334824468000000,
+      "openDate": "2021-09-12T20:00:00.000Z",
+      "status": "OPEN",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631339930202000000,
+      "openDate": "2021-09-12T20:00:00.000Z",
+      "status": "SUSPENDED",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631339939435000000,
+      "openDate": "2021-09-12T20:00:00.000Z",
+      "status": "OPEN",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631476915685000000,
+      "openDate": "2021-09-12T20:15:00.000Z",
+      "status": "OPEN",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631477521419000000,
+      "openDate": "2021-09-12T20:08:00.000Z",
+      "status": "OPEN",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631477832479000000,
+      "openDate": "2021-09-12T20:08:00.000Z",
+      "status": "SUSPENDED",
+      "betDelay": 0,
+      "inPlay": false,
+      "complete": true
+    },
+    {
+      "timestamp": 1631477833160000000,
+      "openDate": "2021-09-12T20:08:00.000Z",
+      "status": "OPEN",
+      "betDelay": 3,
+      "inPlay": true,
+      "complete": true
+    },
+    {
+      "timestamp": 1631486006482000000,
+      "openDate": "2021-09-12T20:08:00.000Z",
+      "status": "SUSPENDED",
+      "betDelay": 3,
+      "inPlay": true,
+      "complete": true
+    },
+    {
+      "timestamp": 1631486183103000000,
+      "openDate": "2021-09-12T20:08:00.000Z",
+      "status": "CLOSED",
+      "betDelay": 3,
+      "inPlay": true,
+      "complete": true
+    }
+  ]
+}
+```
+
+## 4- check and save JSOn
+
+Now we should check that the json file is correct and consistent.
+Now that the markert JSON is complete we can save that in `code/exportOutput/markets` (for the moment it save all togheter but we can mantain the original path, so divided by sport and types)
+
+`code/exportOutput/markets/BASIC/SOCCER`
+`code/exportOutput/markets/BASIC/TENNIS`
+`code/exportOutput/markets/BASIC/HORSE RACING`
+
+
+`code/exportOutput/markets/ADVANCED/SOCCER`
+`code/exportOutput/markets/ADVANCED/TENNIS`
+`code/exportOutput/markets/ADVANCED/HORSE RACING`
+
+## 5- check and generate RunnerDB
+
+We should start to generate the runnersDB JSON.
+
+In order to do that we have to save form market info, under runner info
+id: id of the runner
+name: name of the runner
+
+
+```python
+
+    # ##
+    #  --- RUNNERS DB CREATOR ---
+    # ##
+    print('\n\n------ 4 -GENEREATE RUNNERS INFO------')
+    runnersDB = RunnersDB()
+    for marketList in marketList:
+        runnersDB.saveRunnersOfMarket(marketList)
+```
+NB: don't add duplicate runner or runners id that already present in the list
+
+We should save the JSON list with this filename `code/exportOutput/runner/runnerDB_CURRENTDATE`
+
+
+
+<b>fell free to write me if you have some problem to undertand this documentation or the code</b>
+
 
 
 
