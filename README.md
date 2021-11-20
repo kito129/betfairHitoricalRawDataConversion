@@ -1,13 +1,27 @@
 <br />
 <div align="center">
 
-  <h3 align="center">DB SPECIFICATION</h3>
+  <h3 align="center">RAW BETFAIR TO MY JSON</h3>
 
   <p align="center">
-    A formal specification of raw data, tre process to convert data to obtain myJSON object and final population of DB
+    A formal specification of raw data, tre process to convert data to obtain myJSON object and how to add additional data. At the end generate Market JSON and runners JSON
   </p>
 </div>
 
+----------------------------
+## Some repo and links to look an take inspiration
+
+* [Betfair Historical Data website](https://historicdata.betfair.com/#/help)
+* [Betfair Official Developer Program](https://docs.developer.betfair.com/display/1smk3cen4v3lu3yomq5qye0ni/Developer+Support)
+* [historic-data-workbook](https://github.com/betfair/historic-data-workbook)
+* [historicdata](https://github.com/betfair/historicdata)
+* [API-NG-Excel-Toolkit](https://github.com/betfair/API-NG-Excel-Toolkit)
+* [AwesomeBetfair](https://github.com/betfair-down-under/AwesomeBetfair)
+* [flumine](https://github.com/marcoselva/flumine)
+* [betfair](https://github.com/liampauling/betfair)
+* [betfairdata](https://github.com/liampauling/betfairdata)
+* [betfair](https://github.com/liampauling/betfair)
+* [betfair](https://betfair-datascientists.github.io/)
 
 ## Raw Data definition
 
