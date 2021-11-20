@@ -201,6 +201,29 @@ the current code save the file without BASIC or ADVANCED prefix and without spor
 
 Now start the real conversion task.
 
+### Raw specification
+
+
+#### Market Type
+
+The market type list you should use
+
+|    | marketType               |      eventName |      sport |      note |      nOfRunners |
+|---:|:---------------------------|:--------|:--------|:--------|
+|  1 | WIN | WIN | HORSE RACING | winner of the race | typical 2 ore more runners |
+|  2 | BOTH_TEAMS_TO_SCORE | WIN | SOCCER | both teams score at least one goal | 2 runners: YES, NO |
+|  3 | HALF_TIME | WIN | SOCCER | half time result | 3 runner, 2 team and THE DRAW |
+|  4 | MATCH_ODDS | Match Odds | SOCCER | final time result | 3 runner, 2 team and THE DRAW |
+|  5 | OVER_UNDER 05 | Over/Under 0.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 0.5 Goals, Over 0.5 Goals |
+|  6 | OVER_UNDER 15 | Over/Under 1.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 1.5 Goals, Over 1.5 Goals |
+|  7 | OVER_UNDER 25 | Over/Under 2.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 2.5 Goals, Over 2.5 Goals |
+|  8 | OVER_UNDER 35 | Over/Under 3.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 3.5 Goals, Over 3.5 Goals |
+|  9 | OVER_UNDER 45 | Over/Under 4.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 4.5 Goals, Over 4.5 Goals |
+| 10 | OVER_UNDER 55 | Over/Under 5.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 5.5 Goals, Over 5.5 Goals |
+| 11 | CORRECT_SCORE | Correct Score | SOCCER | total numer of the goals in the match | 2: Under 5.5 Goals, Over 5.5 Goals |
+| 12 | MATCH_ODDS | Match Odds | TENNIS | final time result | 2 runner, name of Player |
+
+
 
 
 ### Panda dataframe and line separation
@@ -317,6 +340,8 @@ have "mc" props and "rc" props inside
   ]
 }
 ```
+
+
 
 At the end of proces we could have this division
 
