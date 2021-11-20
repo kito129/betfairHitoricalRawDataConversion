@@ -861,17 +861,17 @@ After this pass we should save this info in runner and now the runners info look
 
 As i said now the market info from betfair is complete, but in order to have a complete DB we have to add some info form this file
 
-TENNIS: 
-  [TENNIS ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/TENNIS)
-  [TENNIS ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/excel/TennisNotes.txt)
+* TENNIS: 
+* [TENNIS ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/TENNIS)
+* [TENNIS ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/excel/TennisNotes.txt)
 
 
-SOCCER:
-  [SOCCER ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/SOCCER)
-  [SOCCER ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/excel/SoccerNotes.txt)
+* SOCCER:
+* [SOCCER ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/SOCCER)
+* [SOCCER ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/excel/SoccerNotes.txt)
 
-HORSE: 
-  no additional info
+* HORSE: 
+* no additional info
 
 The task should check in the excel or csv file if the market is present (it's possible that not exist in excel Db)
 looking by marketName, runner name and date.
@@ -1163,14 +1163,13 @@ at end of this proces the complete file should look like this (odds part are omm
 Now we should check that the json file is correct and consistent.
 Now that the markert JSON is complete we can save that in `code/exportOutput/markets` (for the moment it save all togheter but we can mantain the original path, so divided by sport and types)
 
-`code/exportOutput/markets/BASIC/SOCCER`
-`code/exportOutput/markets/BASIC/TENNIS`
-`code/exportOutput/markets/BASIC/HORSE RACING`
+* `code/exportOutput/markets/BASIC/SOCCER`
+* `code/exportOutput/markets/BASIC/TENNIS`
+* `code/exportOutput/markets/BASIC/HORSE RACING`
 
-
-`code/exportOutput/markets/ADVANCED/SOCCER`
-`code/exportOutput/markets/ADVANCED/TENNIS`
-`code/exportOutput/markets/ADVANCED/HORSE RACING`
+* `code/exportOutput/markets/ADVANCED/SOCCER`
+* `code/exportOutput/markets/ADVANCED/TENNIS`
+* `code/exportOutput/markets/ADVANCED/HORSE RACING`
 
 ## 6- check and generate RunnerDB
 
