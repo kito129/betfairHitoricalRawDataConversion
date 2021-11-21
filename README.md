@@ -1,15 +1,36 @@
-<br />
-<div align="center">
+# RAW BETFAIR TO MY JSON
 
-  <h3 align="center">RAW BETFAIR TO MY JSON</h3>
+These are the required project specifications.
+All material is based on the code contained in /code
 
-  <p align="center">
-    A formal specification of raw data, tre process to convert data to obtain myJSON object and how to add additional data. At the end generate Market JSON and runners JSON
-  </p>
-</div>
+I ask that you follow the project specifications strictly, but feel free to make the best changes necessary to make the code robust, reliable, and performant as it will be the basis of a very large project I plan to develop.
+
+
+
+The following docs index:
+
+Specification
+
+* [Other Repo](#other-repo)
+* [Raw Data definition](#raw-data-definition)
+
+
+
+* [Downloading RAW data from Betfair](#other-repo)
+* [Extracting the archives and dividing by sport and data type](#head1234)
+* [Creation of the temporal data frame](#head1234)
+* [Splitting of data and first JSON](#head1234)
+* [Data conversion into specification](#head1234)
+* [Correction of temporal bugs](#head1234)
+* [Save metadata quotas and runners](#head1234)
+* [Runner list creation](#head1234)
+* [Saving and split in folders of final files](#head1234)
+
 
 ----------------------------
-## Some repo and links to look an take inspiration
+## Other repo
+
+Some repo and links related to the project
 
 * [Betfair Historical Data website](https://historicdata.betfair.com/#/help)
 * [Betfair Official Developer Program](https://docs.developer.betfair.com/display/1smk3cen4v3lu3yomq5qye0ni/Developer+Support)
@@ -28,10 +49,10 @@
 * [Betfair Docs](https://github.com/marcoselva/dataConversionFiverr/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
 
 The database on which we will operate will be purchased from Betfair exchange and will include all the matches on the platform, with information about:
-* The event information
-* The market updates (event open, inPlay, closed..).
-* The runners (the competitors of the event) 
-* The odds (price, volume and available prices).
+* The market event information
+* The market updates (event OPEN, SUSPENDED, CLOSEED, the status of inPlay and betDelay..).
+* The runner's information (the competitors of the event) 
+* The odds (price, volume and available prices to bet).
 
 Additional data information ( such as final result, bookmaker odds and some stats) that will be add over a 
 * [Soccer Additional Data](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/SOCCER)
@@ -40,24 +61,27 @@ Additional data information ( such as final result, bookmaker odds and some stat
 
 This is a sample of market Djokovic v Medvedev of 12/09/2021
 
-[`1.187528277.bz2.json`](https://github.com/marcoselva/dataConversionFiverr/blob/main/sample/input/1.187528277.bz2.json)
+ADVANCED[`1.187528277.bz2.json`](https://github.com/marcoselva/dataConversionFiverr/blob/main/sample/input/1.187528277.bz2.json)
+
++++++
+BASIC[`1.187528277.bz2.json`](https://github.com/marcoselva/dataConversionFiverr/blob/main/sample/input/1.187528277.bz2.json)
 
 
 As you can see this is a list of Market change in the time (pt is published time), and the main propose is to convert this time data in
 * A single version of market info (event, name, time, open date and all info about the market) -> from now on we will call it <b> MarketInfo</b>
-* A single version of market runners,  All info about selection of the markets (id, name, position...) -> from now on we will call it <b> MarketSelections</b>
-* The odds information during the time about all selection in the market (time of update, price, volume and available prices...) -> from now on we will call it <b> MarketPrices</b>
+* A single version of market runners, all info about runners of the markets (id, name, position...) -> from now on we will call it <b> MarketRunners</b>
+* The odd information during the time about all runners in the market (time of update, price, volume and available prices...) -> from now on we will call it <b> MarketPrices</b>
 * The update of the market during the time (open, suspended market, in play, event start, event closed...) -> from now on we will call it <b> MarketUpdates</b>
-
 
 As you can see there are two types of data:
 * BASIC
 * ADVANCED
 
-Both contain the same information, but ADVANCED has updates every second and complex odds data (time, odds, traded volume, available to bet) while BASIC has updates every minute and the only odds information is time and last traded.
+Both contain the same information, but 
+* ADVANCED has updates every second and complex odds data (time, odds, traded volume, available to bet)  
+* BASIC has updates every minute and the only odds information is only timestamp and last traded prices (odds)
 
-
-The raw data folder  is 
+### The raw data folder are
 * [Raw data ADVANCED](https://github.com/marcoselva/dataConversionFiverr/tree/main/rawData/ADVANCED)
 * [Raw data BASIC](https://github.com/marcoselva/dataConversionFiverr/tree/main/rawData/BASIC)
 
@@ -66,40 +90,67 @@ each folder contains subfolder
 * /SOCCER
 * /HORSE RACING
 
-The purpose of the code to be created would be to be able to interpret both types of data, and automatically determine whether it is ADVANCED or BASIC
-Then create in the db the occurrences found and then define for that market UNIQUE:
 
-* Market Info 
-* Market Selection
+## Market Specification
 
-While two separate enities for 
+### Market Sport
+| # 	| sport 	|
+|---	|---	|
+| 1 	| HORSE RACING 	|
+| 2 	| SOCCER 	|
+| 3 	| TENNIS 	|
 
-* MarketBasicUpdates
-* MarketBasicPrices
+### Market Type
 
-* MarketAdvancedUpdates
-* MarketAdvancedPrices
+The market type list you should use
 
-So as to be able to search for events and selections in a unique way, and then display, according to availability, only BASIC, only ADVANCED or both types of data.
+| # 	| marketType 	| eventName 	| sport 	| note 	| nOfRunners 	|
+|---	|---	|---	|---	|---	|---	|
+| 1 	| WIN 	| Winner 	| HORSE RACING 	| winner of the race 	| typical #2 ore more runners, the name of runners, ex: End Zone, State Secretary, Daniel Deronda...  	|
+| 2 	| MATCH_ODDS 	| Match Odds 	| SOCCER 	| winner of the match 	| #3: 2 name of the team and The Draw, ex: Inter, Juventus, The Draw	|
+| 3 	| HALF_TIME 	| Half Time 	| SOCCER 	| winner of the half-time 	| #3: 2 name of the team and The Draw, ex: Inter, Juventus, The Draw	|
+| 4 	| BOTH_TEAMS_TO_SCORE 	| Both teams to Score? 	| SOCCER 	| both teams score at least one goal 	| #2: Yes, No 	|
+| 5 	| OVER_UNDER 05 	| Over/Under 0.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 0.5 Goals, Over 0.5 Goals 	|
+| 6 	| OVER_UNDER 15 	| Over/Under 1.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 1.5 Goals, Over 1.5 Goals 	|
+| 7 	| OVER_UNDER 25 	| Over/Under 2.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 2.5 Goals, Over 2.5 Goals 	|
+| 8 	| OVER_UNDER 35 	| Over/Under 3.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 3.5 Goals, Over 3.5 Goals 	|
+| 9 	| OVER_UNDER 45 	| Over/Under 4.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 4.5 Goals, Over 4.5 Goals 	|
+| 10 	| OVER_UNDER 55 	| Over/Under 5.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 5.5 Goals, Over 5.5 Goals 	|
+| 11 	| FIRST_HALF_GOALS_05 	| First Half Goals 0.5 	| SOCCER 	|  total number of the goals in the half-time 	| #2: Under 0.5 Goals, Over 0.5 Goals 	|
+| 12 	| FIRST_HALF_GOALS_15 	| First Half Goals 1.5 	| SOCCER 	|  total number of the goals in the half-time 	| #2: Under 1.5 Goals, Over 1.5 Goals 	|
+| 13 	| FIRST_HALF_GOALS_25 	| First Half Goals 2.5 	| SOCCER 	|  total number of the goals in the half-time 	| #2: Under 2.5 Goals, Over 2.5 Goals 	|
+| 14 	| FIRST_HALF_GOALS_35 	| First Half Goals 3.5 	| SOCCER 	|  total number of the goals in the half-time 	| #2: Under 3.5 Goals, Over 3.5 Goals 	|
+| 15 	| CORRECT_SCORE 	| Correct Score 	| SOCCER 	| correct result of the match 	| typical #16 +#3 always present: 0-0, 0-1, 0-2, 0-3, 1-0, 2-0, 3-0, 1-2, 2-1, 3-1, 1-3, 3-2, 2-3,1-1, 2-2, 3-3, Any Other Home Win, Any Other Away Win, Any Other Draw 	|
+| 16 	| MATCH_ODDS 	| Match Odds 	| TENNIS 	| winner of the match 	| #2: the player Name ex. Novak Djokovic, Daniil Medvedev 	|
 
-# TASK
+# TASK TO DO
 
 ## 1- Download data and Extract principal ZIP
 
 The first process to do is to download the data form [Betfair](https://historicdata.betfair.com/#/home)
-This process includes purchase and authentication task, so i don't want to automate that process.
+This process includes purchase and authentication task, so I don't want to automate that process.
 
 I will provide you a sample of data to working about.
-Then i will use for my self the code over all data to create my personal db.
+Then I will use for my self the code over all data to create my personal db.
 
 The code should be run once a day, as the data is released after 5 days from the end of the event.
 So this code will need to be run once a day to add the newly downloaded markets to the DB.
 
-Every day i will place the data in the /rawData folder and start the code.
+Every day I will place the data in the /rawData (separated in SPORT) folder and start the code.
 
 
+I'll put all the .bz2 archive in this folders
 
-## 2- Extract All market
+`rawData/BASIC/SOCCER/`
+`rawData/BASIC/TENNIS/`
+`rawData/BASIC/HORSE RACING/`
+
+`rawData/ADVANCED/SOCCER/`
+`rawData/ADVANCED/TENNIS/`
+`rawData/ADVANCED/HORSE RACING/`
+
+
+## 2- Extract all market
 
 The current code start with placing the correct folder to analyze in the path (we fix to convert all path in the same time)
 `code/routine.py` 
@@ -111,7 +162,7 @@ The current code start with placing the correct folder to analyze in the path (w
 
 ```python
 
-# the path were al files are extracte, you have to sperate file extracted by sport and by type of data
+# the path were al files are extracted, you have to sperate file extracted by sport and by type of data
 workPath = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/code/rawInput/'
 
 # the path were i will place the file to be converted
@@ -130,22 +181,11 @@ main.main(data_BASIC_HORSE_RACING,workPath,'BASIC')
 
 ```
 
+For the moment the code runs one folder at a time and I have to change the path, but in the new project it should do everything together and eventually divide the markets again by type (ADV / BASIC) and by sport
 
-The situation before starting the code would be:
+We hould extract the .bz2 archive in all sub folder and save as JSON
 
-I put all the .bz2 archive in this folders
-
-`rawData/BASIC/SOCCER/`
-`rawData/BASIC/TENNIS/`
-`rawData/BASIC/HORSE RACING/`
-
-`rawData/ADVANCED/SOCCER/`
-`rawData/ADVANCED/TENNIS/`
-`rawData/ADVANCED/HORSE RACING/`
-
-From here we hould extract the bz2 and save as json
-
-I created this code, that you have to fix and imporve with sport differentiation and type too (BASIC / ADVANCED)
+I created this code, that you have to fix and improve with sport differentiation and type too (BASIC / ADVANCED)
 
 ```python
 # ##
@@ -193,50 +233,21 @@ At the end of this process we could have a folder ( at the moment i didn't imple
 `code/rawInput/ADVANCED/TENNIS/`
 `code/rawInput/ADVANCED/HORSE RACING/`
 
-contains all raw archive data convertet to correct JSON format
-
-the current code save the file without BASIC or ADVANCED prefix and without sport differentiation. We should change that in order to analyze at the same time both ADVANCED and BASIC markets (they have the same market ID so they are separated)
+contains all raw archive data converted to correct JSON format
  
 ## 3- Convert to JSONv1
 
 Now start the real conversion task.
 
-### Raw specification
-
-
-#### Market Type
-
-The market type list you should use
-
-|    | marketType               |      eventName |      sport |      note |      nOfRunners |
-|---:|---------------------------:|--------:|--------:|--------:|
-|  1 | WIN | WIN | HORSE RACING | winner of the race | typical 2 ore more runners |
-|  2 | BOTH_TEAMS_TO_SCORE | WIN | SOCCER | both teams score at least one goal | 2 runners: YES, NO |
-|  3 | HALF_TIME | WIN | SOCCER | half time result | 3 runner, 2 team and THE DRAW |
-|  4 | MATCH_ODDS | Match Odds | SOCCER | final time result | 3 runner, 2 team and THE DRAW |
-|  5 | OVER_UNDER 05 | Over/Under 0.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 0.5 Goals, Over 0.5 Goals |
-|  6 | OVER_UNDER 15 | Over/Under 1.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 1.5 Goals, Over 1.5 Goals |
-|  7 | OVER_UNDER 25 | Over/Under 2.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 2.5 Goals, Over 2.5 Goals |
-|  8 | OVER_UNDER 35 | Over/Under 3.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 3.5 Goals, Over 3.5 Goals |
-|  9 | OVER_UNDER 45 | Over/Under 4.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 4.5 Goals, Over 4.5 Goals |
-| 10 | OVER_UNDER 55 | Over/Under 5.5 Goals | SOCCER | total numer of the goals in the match | 2: Under 5.5 Goals, Over 5.5 Goals |
-| 11 | CORRECT_SCORE | Correct Score | SOCCER | total numer of the goals in the match | 2: Under 5.5 Goals, Over 5.5 Goals |
-| 12 | MATCH_ODDS | Match Odds | TENNIS | final time result | 2 runner, name of Player |
-
-
-
-
 ### Panda dataframe and line separation
-`code/dataframe.py` is were i placed the code that made this division and create an object like this
+`code/dataframe.py` is were the code made this dataframe creation and division about type lines and different info
 
+I convert this `1.1.187528277.json` to a panda dataframe in order to separate all lines and save the pt (publish time in milliseconds UTC)
 
-First in my version i convert this `1.1.187528277.json` to a panda dataframe in order to separate all lines and save the pt (publish time in milliseconds UTC)
+There will be 2 different types of line:
 
-There will be 2 different types of line
-
-MARKET CHANGES
-
-have "mc" props and not "rc" inside
+#### MARKET CHANGES
+This one have "mc" props, inside that "marketDefinition" props and not "rc" props
 
 ```json
 {
@@ -289,15 +300,14 @@ have "mc" props and not "rc" inside
         "openDate": "2021-09-12T20:00:00.000Z",
         "version": 4023449846,
         "name": "Match Odds",
-        "eventName": "Djokovic @ Medvedev"
+        "eventName": "Djokovic v Medvedev"
       }
     }
   ]
 }
   ```
-ODDS UPDATE
-
-have "mc" props and "rc" props inside
+#### ODDS UPDATE
+This one have "mc" props, inside that ahve "rc" props and not "marketDefinition" props
 
 ```json
 {
@@ -334,16 +344,14 @@ have "mc" props and "rc" props inside
           "tv": 16440.85,
           "id": 2249229
         }
-      ],
-      "tv": 19833.28
+      ]
     }
-  ]
+  ],
+  .....
 }
 ```
 
-
-
-At the end of proces we could have this division
+At the end of process of dataframe creation we could have this division
 
 ```python
 mainObj = {
@@ -353,7 +361,7 @@ mainObj = {
 }
 ```
 
-  This is an example of data contained
+This is an example of data contained
 
 `mainObj['market']`
 
@@ -432,7 +440,7 @@ mainObj = {
 | 70 | 2021-09-12 22:36:23.103000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | CLOSED    | Djokovic v Medvedev | Match Odds |          3 | True     | True       |                       0 | 4029887210 |
 
 
-NOTE: for market update we should remove the identical update (line with no changes except "version" value )
+For market update we should remove the identical update lines (line with no changes except "publish_time" and "version" value), and remove version value
 
 this is my code to that (to imporve and fix=
 ```python
@@ -452,28 +460,28 @@ self.marketUpdates = newUpdate
 
 So for this file we should have this 
 
-`mainObj['market"]` // removed identical lines ( exepct version)
+`mainObj['market"]` // removed identical lines
 
-|    | publish_time               |      id |   eventId | marketType   | openDate                 | status    | eventName           | name       |   betDelay | inPlay   | complete   |   numberOfActiveRunners |    version |
-|---:|:---------------------------|--------:|----------:|:-------------|:-------------------------|:----------|:--------------------|:-----------|-----------:|:---------|:-----------|------------------------:|-----------:|
-|  0 | 2021-09-11 03:27:17.213000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T15:00:00.000Z | OPEN      | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 | 4023427524 |
-|  3 | 2021-09-11 04:33:44.468000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:00:00.000Z | OPEN      | Djokovic @ Medvedev | Match Odds |          0 | False    | True       |                       2 | 4023449846 |
-|  4 | 2021-09-11 05:58:50.202000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:00:00.000Z | SUSPENDED | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 | 4023467671 |
-|  5 | 2021-09-11 05:58:59.435000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:00:00.000Z | OPEN      | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 | 4023468035 |
-|  7 | 2021-09-12 20:01:55.685000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:15:00.000Z | OPEN      | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 | 4029685094 |
-|  9 | 2021-09-12 20:12:01.419000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | OPEN      | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 | 4029701160 |
-| 10 | 2021-09-12 20:17:12.479000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | SUSPENDED | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 | 4029712768 |
-| 11 | 2021-09-12 20:17:13.160000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | OPEN      | Djokovic v Medvedev | Match Odds |          3 | True     | True       |                       2 | 4029713448 |
-| 69 | 2021-09-12 22:33:26.482000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | SUSPENDED | Djokovic v Medvedev | Match Odds |          3 | True     | True       |                       2 | 4029883744 |
-| 70 | 2021-09-12 22:36:23.103000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | CLOSED    | Djokovic v Medvedev | Match Odds |          3 | True     | True       |                       0 | 4029887210 |
+|    | publish_time               |      id |   eventId | marketType   | openDate                 | status    | eventName           | name       |   betDelay | inPlay   | complete   |   numberOfActiveRunners |
+|---:|:---------------------------|--------:|----------:|:-------------|:-------------------------|:----------|:--------------------|:-----------|-----------:|:---------|:-----------|------------------------:|
+|  0 | 2021-09-11 03:27:17.213000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T15:00:00.000Z | OPEN      | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 |
+|  3 | 2021-09-11 04:33:44.468000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:00:00.000Z | OPEN      | Djokovic @ Medvedev | Match Odds |          0 | False    | True       |                       2 |
+|  4 | 2021-09-11 05:58:50.202000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:00:00.000Z | SUSPENDED | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 |
+|  5 | 2021-09-11 05:58:59.435000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:00:00.000Z | OPEN      | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 |
+|  7 | 2021-09-12 20:01:55.685000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:15:00.000Z | OPEN      | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 |
+|  9 | 2021-09-12 20:12:01.419000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | OPEN      | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 |
+| 10 | 2021-09-12 20:17:12.479000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | SUSPENDED | Djokovic v Medvedev | Match Odds |          0 | False    | True       |                       2 |
+| 11 | 2021-09-12 20:17:13.160000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | OPEN      | Djokovic v Medvedev | Match Odds |          3 | True     | True       |                       2 |
+| 69 | 2021-09-12 22:33:26.482000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | SUSPENDED | Djokovic v Medvedev | Match Odds |          3 | True     | True       |                       2 |
+| 70 | 2021-09-12 22:36:23.103000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | CLOSED    | Djokovic v Medvedev | Match Odds |          3 | True     | True       |                       0 |
 
 
 `mainObj['runners"]`
 
 |     | status   |       id | name            |   sortPriority |
 |----:|:---------|---------:|:----------------|---------------:|
-| 140 | LOSER    |  2249229 | Novak Djokovic  |              1 |
-| 141 | WINNER   | 19924831 | Daniil Medvedev |              2 |
+| 1 | LOSER    |  2249229 | Novak Djokovic  |              1 |
+| 2 | WINNER   | 19924831 | Daniil Medvedev |              2 |
 
 
 `mainObj['odds"]` // some lines are removed here to view
@@ -513,20 +521,18 @@ So for this file we should have this
 
 ### Panda dataframe to python object
 
-Now we have completed conversion from original file to panda dataframe
-
-After that dataframe creation we should have this mainObj
+Now we have completed conversion from original raw file to panda dataframe
 
 It's the moment to start to convert in python object
 
-i pass this obj to convertToMyObject(dataframe, path, status) function tha is in `code/dfToObeject.py`
+We pass this obj to convertToMyObject(dataframe, path, status) function tha is in `code/dfToObeject.py`
 
 in this file i separate MarketInfo, MarketSelection, MarketUpdates, MarketPrices entities and i covert panda df to python obj
 
 The class is defined in `code/object/markets.py` 
 The constructor take the dataframe and create a python object based on last market update
 
-I take into consideration the <b>last market changes update</b> to be sure to get the complete info (based on the fact that they are the info on which will be based the settlement of the market and then its closing)
+I take into consideration the <b>last market changes update</b> for makert info and runners to be sure to get the complete and correct info (based on the fact that they are the info on which will be based the settlement of the market and then its closing)
 
 
 ### Match updates fix (correct openDate)
@@ -555,13 +561,13 @@ To correct this error
 | 70 | 2021-09-12 22:36:23.103000 | 1.18753 |  30891863 | MATCH_ODDS   | 2021-09-12T20:08:00.000Z | CLOSED    | Djokovic v Medvedev | Match Odds |          3 | True     | True       |                       0 | 4029887210 |
 
 
-like here as you can see betfair report for open date 2021-09-12T20:08:00.000Z, but the correct in play time is 2021-09-12 20:17:13.160000, and we can find it iterating over the marketUpdate array and stopping the search when these conditions are all true:
+like here as you can see betfair report for openDate = 2021-09-12T20:08:00.000Z, but the correct in play time is 2021-09-12 20:17:13.160000, and we can find it iterating over the marketUpdate array and stopping the search when these conditions are all true:
 
-* status = OPEN
-* inPlay = TRUE
+* status = 'OPEN'
+* inPlay = True
 * betDelay > 0
 
-something  like this 
+something like this 
 ```python
 inPlayTime = 0
 #find open time for market Update
@@ -586,33 +592,30 @@ And ONLY FOR TENNIS, we should remove match with "/" in event name (all doubles 
 
 ### Improve runner info and odds information
 
-Now the object is complete, it's the time to improve runners data based on odds information.
+Now the object is complete, it's the time to improve runners metadata based on odd information.
 
 ```python
     # update updates with odds for the status
     mainMarket.updateRunnersStats(status)
 ```
 
-
-
-With this code i save this info about the runners
-
+With this code we save this info about the runners
 
 * runners['inPlayOdds']: the first odds (ltp values) after the market is inPlay (first runners odds after openDate time)
 * runners['inPlayIndex']: the first odds (ltp values) after the market is inPlay (the index in odds array)
 * runners['inPlayTime']: the first odds timestamp (ltp values) after the market is inPlay (the first timestamp for this runner after openDate )
-* runners['lengthOdds']: the total lenght of the odds array
-* runners['lengthOddsPrematch']: the total lenght of the odds before the openDate
-* runners['lengthOddsInPlay']: the total lenght of the odds from the openDate to the market CLOSE
 * runners['closedOdds']: the last odds (ltp values) for the runner
 * runners['avgPrematch']: the average odds before openDate
 * runners['maxPrematch']: the max odds reached (ltp values) by the runner before the openDate time
 * runners['minPrematch']: the min odds reached (ltp values) by the runner before the openDate time
 * runners['maxInPlay']: the max odds reached (ltp values) by the runner after the openDate time
 * runners['minInPlay']: the min odds reached (ltp values) by the runner after the openDate time
+* runners['lengthOdds']: the total lenght of the odds array
+* runners['lengthOddsPrematch']: the total lenght of the odds before the openDate
+* runners['lengthOddsInPlay']: the total lenght of the odds from the openDate to the market CLOSE
 ### Volume  info for ADVANCED
 
-if status == 'ADVANCED': // only for advanced data
+if status == 'ADVANCED': 
 
 * runners['tradedVolume']: the total traded volume on this runner (should be the last chronological "tv" volume)
 * runners['preMatchVolume']: the total traded volume on this runner before the open date
@@ -740,7 +743,7 @@ if status == 'ADVANCED': // only for advanced data
 ```
 
 
-After this pass we should save this info in runner and now the runners info looks likes (odds are removed here)
+After this pass we should save this info in file, with improved runner info that should looks likes: (odds part are ommised)
 
 ```json
 {
@@ -752,6 +755,11 @@ After this pass we should save this info in runner and now the runners info look
     "openDate": 1631477833160,
     "name": "Djokovic v Medvedev",
     "numberOfActiveRunner": 2,
+    "numberOfWinners": 1,
+    "bspMarket": false,
+    "turnInPlayEnabled": true,
+    "persistenceEnabled": true,
+    "timezone": "Europe/London",
     "countryCode": "US",
     "sport": "TENNIS",
     "venue": "",
@@ -813,9 +821,9 @@ After this pass we should save this info in runner and now the runners info look
     }
   ],
   "marketUpdates": [
-    {
-      "timestamp": 1631330837213000000,
-      "openDate": "2021-09-12T15:00:00.000Z",
+    { 
+      "timestamp":  1631330837213000000,
+      "openDate":   1631458800000,
       "status": "OPEN",
       "betDelay": 0,
       "inPlay": false,
@@ -823,7 +831,7 @@ After this pass we should save this info in runner and now the runners info look
     },
     {
       "timestamp": 1631334824468000000,
-      "openDate": "2021-09-12T20:00:00.000Z",
+      "openDate": 1631476800000,
       "status": "OPEN",
       "betDelay": 0,
       "inPlay": false,
@@ -831,7 +839,7 @@ After this pass we should save this info in runner and now the runners info look
     },
     {
       "timestamp": 1631339930202000000,
-      "openDate": "2021-09-12T20:00:00.000Z",
+      "openDate": 1631476800000,
       "status": "SUSPENDED",
       "betDelay": 0,
       "inPlay": false,
@@ -839,7 +847,7 @@ After this pass we should save this info in runner and now the runners info look
     },
     {
       "timestamp": 1631339939435000000,
-      "openDate": "2021-09-12T20:00:00.000Z",
+      "openDate": 1631476800000,
       "status": "OPEN",
       "betDelay": 0,
       "inPlay": false,
@@ -847,7 +855,7 @@ After this pass we should save this info in runner and now the runners info look
     },
     {
       "timestamp": 1631476915685000000,
-      "openDate": "2021-09-12T20:15:00.000Z",
+      "openDate": 1631477700000,
       "status": "OPEN",
       "betDelay": 0,
       "inPlay": false,
@@ -855,7 +863,7 @@ After this pass we should save this info in runner and now the runners info look
     },
     {
       "timestamp": 1631477521419000000,
-      "openDate": "2021-09-12T20:08:00.000Z",
+      "openDate": 1631477280000,
       "status": "OPEN",
       "betDelay": 0,
       "inPlay": false,
@@ -863,7 +871,7 @@ After this pass we should save this info in runner and now the runners info look
     },
     {
       "timestamp": 1631477832479000000,
-      "openDate": "2021-09-12T20:08:00.000Z",
+      "openDate": 1631477280000,
       "status": "SUSPENDED",
       "betDelay": 0,
       "inPlay": false,
@@ -871,7 +879,7 @@ After this pass we should save this info in runner and now the runners info look
     },
     {
       "timestamp": 1631477833160000000,
-      "openDate": "2021-09-12T20:08:00.000Z",
+      "openDate": 1631477280000,
       "status": "OPEN",
       "betDelay": 3,
       "inPlay": true,
@@ -879,7 +887,7 @@ After this pass we should save this info in runner and now the runners info look
     },
     {
       "timestamp": 1631486006482000000,
-      "openDate": "2021-09-12T20:08:00.000Z",
+      "openDate": 1631477280000,
       "status": "SUSPENDED",
       "betDelay": 3,
       "inPlay": true,
@@ -887,43 +895,129 @@ After this pass we should save this info in runner and now the runners info look
     },
     {
       "timestamp": 1631486183103000000,
-      "openDate": "2021-09-12T20:08:00.000Z",
+      "openDate": 1631477280000,
       "status": "CLOSED",
       "betDelay": 3,
       "inPlay": true,
       "complete": true
     }
-  ]
+  ],
+  "odds":
+  ....
 }
 ```
 
 ## 4- Additional data
 
-As i said now the market info from betfair is complete, but in order to have a complete DB we have to add some info form this file
+As i said now the market info from Betfair is complete, but in order to have a complete DB we have to add some info form this file
 
-* TENNIS: 
+### Tennis Data
 * [TENNIS ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/TENNIS)
 * [TENNIS ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/excel/TennisNotes.txt)
 
+| ATP 	| B 	| C 	| D 	| E 	| F 	| G 	| H 	| I 	| J 	| K 	| L 	| M 	| N 	| O 	| P 	| Q 	| R 	| S 	| T 	| U 	| V 	| W 	| X 	| Y 	| Z 	| AA 	| AB 	| AC 	| AD 	| AE 	| AF 	| AG 	| AH 	| AI 	| AJ 	|
+|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|
+| ATP 	| Location 	| Tournament 	| Date 	| Series 	| Court 	| Surface 	| Round 	| Best of 	| Winner 	| Loser 	| WRank 	| LRank 	| WPts 	| LPts 	| W1 	| L1 	| W2 	| L2 	| W3 	| L3 	| W4 	| L4 	| W5 	| L5 	| Wsets 	| Lsets 	| Comment 	| B365W 	| B365L 	| PSW 	| PSL 	| MaxW 	| MaxL 	| AvgW 	| AvgL 	|
+| 1 	| Antalya 	| Antalya Open 	| 1/7/2021 	| ATP250 	| Indoor 	| Hard 	| 1st Round 	| 3 	| Basilashvili N. 	| Arnaboldi A. 	| 40 	| 267 	| 1395 	| 206 	| 4 	| 6 	| 7 	| 5 	| 6 	| 1 	|  	|  	|  	|  	| 2 	| 1 	| Completed 	| 1.5 	| 2.5 	| 1.61 	| 2.44 	| 1.67 	| 2.56 	| 1.56 	| 2.42 	|
+| 1 	| Antalya 	| Antalya Open 	| 1/7/2021 	| ATP250 	| Indoor 	| Hard 	| 1st Round 	| 3 	| Celikbilek A. 	| Zuk K. 	| 309 	| 262 	| 150 	| 209 	| 7 	| 6 	| 7 	| 5 	|  	|  	|  	|  	|  	|  	| 2 	| 0 	| Completed 	| 2.5 	| 1.5 	| 2.63 	| 1.54 	| 2.7 	| 1.55 	| 2.57 	| 1.5 	|
+| 1 	| Antalya 	| Antalya Open 	| 1/7/2021 	| ATP250 	| Indoor 	| Hard 	| 1st Round 	| 3 	| Ruusuvuori E. 	| Vesely J. 	| 87 	| 67 	| 806 	| 928 	| 6 	| 3 	| 7 	| 6 	|  	|  	|  	|  	|  	|  	| 2 	| 0 	| Completed 	| 1.5 	| 2.5 	| 1.56 	| 2.58 	| 1.63 	| 3.03 	| 1.52 	| 2.53 	|
+| 1 	| Antalya 	| Antalya Open 	| 1/7/2021 	| ATP250 	| Indoor 	| Hard 	| 1st Round 	| 3 	| Bublik A. 	| Caruso S. 	| 49 	| 76 	| 1090 	| 858 	| 6 	| 3 	| 6 	| 3 	|  	|  	|  	|  	|  	|  	| 2 	| 0 	| Completed 	| 1.61 	| 2.2 	| 1.81 	| 2.09 	| 1.87 	| 2.3 	| 1.72 	| 2.11 	|
+| 1 	| Antalya 	| Antalya Open 	| 1/7/2021 	| ATP250 	| Indoor 	| Hard 	| 1st Round 	| 3 	| Goffin D. 	| Herbert P.H. 	| 16 	| 83 	| 2555 	| 822 	| 3 	| 6 	| 7 	| 5 	| 6 	| 0 	|  	|  	|  	|  	| 2 	| 1 	| Completed 	| 1.4 	| 2.75 	| 1.46 	| 2.92 	| 1.5 	| 3 	| 1.44 	| 2.78 	|
+| 1 	| Antalya 	| Antalya Open 	| 1/7/2021 	| ATP250 	| Indoor 	| Hard 	| 1st Round 	| 3 	| Travaglia S. 	| Kecmanovic M. 	| 75 	| 42 	| 869 	| 1328 	| 1 	| 6 	| 6 	| 4 	| 6 	| 0 	|  	|  	|  	|  	| 2 	| 1 	| Completed 	| 2.62 	| 1.44 	| 2.8 	| 1.49 	| 2.85 	| 1.5 	| 2.71 	| 1.45 	|
+| 1 	| Antalya 	| Antalya Open 	| 1/8/2021 	| ATP250 	| Indoor 	| Hard 	| 1st Round 	| 3 	| Struff J.L. 	| Kotov P. 	| 37 	| 269 	| 1450 	| 205 	| 6 	| 4 	| 6 	| 3 	|  	|  	|  	|  	|  	|  	| 2 	| 0 	| Completed 	| 1.22 	| 4 	| 1.24 	| 4.44 	| 1.27 	| 4.6 	| 1.22 	| 4.16 	|
+| 1 	| Antalya 	| Antalya Open 	| 1/8/2021 	| ATP250 	| Indoor 	| Hard 	| 1st Round 	| 3 	| Lamasine T. 	| Gerasimov E. 	| 271 	| 78 	| 204 	| 840 	| 7 	| 6 	| 6 	| 2 	|  	|  	|  	|  	|  	|  	| 2 	| 0 	| Completed 	| 5 	| 1.16 	| 5.74 	| 1.17 	| 5.74 	| 1.22 	| 5.12 	| 1.16 	|
 
-* SOCCER:
+
+NB: If the match is found in ATP.xlsx under 2021 folder so we place the value:
+```json
+   "federation": "ATP", 
+   "sex": "MALE",
+   "season": 2021
+```
+
+If found in WTA excel under 2020 folder so:  
+
+```json
+   "federation": "WTA", 
+   "sex": "FEMALE",
+   "season": 2020
+```
+
+### Soccer Data
+
 * [SOCCER ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/SOCCER)
 * [SOCCER ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/excel/SoccerNotes.txt)
 
-* HORSE: 
-* no additional info
+| A 	| B 	| C 	| D 	| E 	| F 	| G 	| H 	| I 	| J 	| K 	| L 	| M 	| N 	| O 	| P 	| Q 	| R 	| S 	| T 	| U 	| V 	| W 	| X 	| Y 	| Z 	| AA 	| AB 	| AC 	| AD 	| AE 	| AF 	| AG 	| AH 	| AI 	| AJ 	| AK 	| AL 	| AM 	| AN 	| AO 	| AP 	| AQ 	| AR 	| AS 	| AT 	| AU 	| AV 	| AW 	| AX 	| AY 	| AZ 	| BA 	| BB 	| BC 	| BD 	| BE 	| BF 	| BG 	| BH 	| BI 	| BJ 	| BK 	| BL 	| BM 	| BN 	| BO 	| BP 	| BQ 	| BR 	| BS 	| BT 	| BU 	| BV 	| BW 	| BX 	| BY 	| BZ 	| CA 	| CB 	| CC 	| CD 	| CE 	| CF 	| CG 	| CH 	| CI 	| CJ 	| CK 	| CL 	| CM 	| CN 	| CO 	| CP 	| CQ 	| CR 	| CS 	| CT 	| CU 	| CV 	| CW 	| CX 	| CY 	| CZ 	| DA 	|
+|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|
+| Div 	| Date 	| Time 	| HomeTeam 	| AwayTeam 	| FTHG 	| FTAG 	| FTR 	| HTHG 	| HTAG 	| HTR 	| HS 	| AS 	| HST 	| AST 	| HF 	| AF 	| HC 	| AC 	| HY 	| AY 	| HR 	| AR 	| B365H 	| B365D 	| B365A 	| BWH 	| BWD 	| BWA 	| IWH 	| IWD 	| IWA 	| PSH 	| PSD 	| PSA 	| WHH 	| WHD 	| WHA 	| VCH 	| VCD 	| VCA 	| MaxH 	| MaxD 	| MaxA 	| AvgH 	| AvgD 	| AvgA 	| B365>2.5 	| B365<2.5 	| P>2.5 	| P<2.5 	| Max>2.5 	| Max<2.5 	| Avg>2.5 	| Avg<2.5 	| AHh 	| B365AHH 	| B365AHA 	| PAHH 	| PAHA 	| MaxAHH 	| MaxAHA 	| AvgAHH 	| AvgAHA 	| B365CH 	| B365CD 	| B365CA 	| BWCH 	| BWCD 	| BWCA 	| IWCH 	| IWCD 	| IWCA 	| PSCH 	| PSCD 	| PSCA 	| WHCH 	| WHCD 	| WHCA 	| VCCH 	| VCCD 	| VCCA 	| MaxCH 	| MaxCD 	| MaxCA 	| AvgCH 	| AvgCD 	| AvgCA 	| B365C>2.5 	| B365C<2.5 	| PC>2.5 	| PC<2.5 	| MaxC>2.5 	| MaxC<2.5 	| AvgC>2.5 	| AvgC<2.5 	| AHCh 	| B365CAHH 	| B365CAHA 	| PCAHH 	| PCAHA 	| MaxCAHH 	| MaxCAHA 	| AvgCAHH 	| AvgCAHA 	|
+| I1 	| 21/08/2021 	| 17:30 	| Inter 	| Genoa 	| 4 	| 0 	| H 	| 2 	| 0 	| H 	| 17 	| 11 	| 8 	| 5 	| 18 	| 7 	| 8 	| 2 	| 1 	| 2 	| 0 	| 0 	| 1.33 	| 5.25 	| 9 	| 1.33 	| 5.5 	| 8.5 	| 1.37 	| 5.25 	| 8 	| 1.36 	| 5.37 	| 9.65 	| 1.35 	| 5 	| 9 	| 1.3 	| 5 	| 10 	| 1.4 	| 5.5 	| 10 	| 1.35 	| 5.16 	| 8.94 	| 1.66 	| 2.2 	| 1.67 	| 2.33 	| 1.71 	| 2.38 	| 1.63 	| 2.28 	| -1.25 	| 1.75 	| 2.05 	| 1.81 	| 2.11 	| 1.87 	| 2.13 	| 1.8 	| 2.07 	| 1.28 	| 5.75 	| 11 	| 1.3 	| 5.25 	| 10.5 	| 1.3 	| 5.25 	| 11 	| 1.31 	| 5.78 	| 11.37 	| 1.29 	| 5.5 	| 11 	| 1.25 	| 5.75 	| 11.5 	| 1.35 	| 6.25 	| 12.75 	| 1.29 	| 5.58 	| 10.84 	| 1.61 	| 2.3 	| 1.61 	| 2.45 	| 1.7 	| 2.55 	| 1.62 	| 2.32 	| -1.5 	| 1.88 	| 2.05 	| 1.89 	| 2.03 	| 1.96 	| 2.09 	| 1.86 	| 2.01 	|
+| I1 	| 21/08/2021 	| 17:30 	| Verona 	| Sassuolo 	| 2 	| 3 	| A 	| 0 	| 1 	| A 	| 12 	| 15 	| 4 	| 8 	| 11 	| 12 	| 7 	| 4 	| 3 	| 2 	| 1 	| 0 	| 2.62 	| 3.3 	| 2.62 	| 2.55 	| 3.5 	| 2.7 	| 2.6 	| 3.45 	| 2.7 	| 2.66 	| 3.55 	| 2.75 	| 2.6 	| 3.4 	| 2.7 	| 2.63 	| 3.25 	| 2.7 	| 2.74 	| 3.55 	| 2.79 	| 2.61 	| 3.43 	| 2.69 	| 1.9 	| 2.03 	| 1.87 	| 2.04 	| 1.9 	| 2.06 	| 1.85 	| 1.98 	| 0 	| 1.93 	| 2 	| 1.93 	| 1.99 	| 1.95 	| 2.01 	| 1.91 	| 1.97 	| 2.5 	| 3.4 	| 2.75 	| 2.55 	| 3.5 	| 2.7 	| 2.55 	| 3.35 	| 2.75 	| 2.64 	| 3.43 	| 2.84 	| 2.5 	| 3.4 	| 2.8 	| 2.55 	| 3.25 	| 2.8 	| 2.75 	| 3.5 	| 2.9 	| 2.57 	| 3.4 	| 2.76 	| 1.8 	| 2 	| 1.81 	| 2.1 	| 1.87 	| 2.17 	| 1.8 	| 2.03 	| 0 	| 1.88 	| 2.05 	| 1.89 	| 2.04 	| 2 	| 2.07 	| 1.86 	| 2.02 	|
+| I1 	| 21/08/2021 	| 19:45 	| Empoli 	| Lazio 	| 1 	| 3 	| A 	| 1 	| 3 	| A 	| 16 	| 8 	| 5 	| 5 	| 13 	| 10 	| 5 	| 3 	| 2 	| 1 	| 0 	| 0 	| 4.6 	| 4 	| 1.7 	| 4.6 	| 3.9 	| 1.75 	| 4.6 	| 3.95 	| 1.7 	| 5.01 	| 4.02 	| 1.74 	| 4.75 	| 3.7 	| 1.75 	| 5 	| 3.7 	| 1.7 	| 5.01 	| 4.03 	| 1.79 	| 4.71 	| 3.9 	| 1.73 	| 1.72 	| 2.1 	| 1.75 	| 2.19 	| 1.78 	| 2.21 	| 1.72 	| 2.15 	| 0.75 	| 1.98 	| 1.95 	| 1.97 	| 1.94 	| 2 	| 2 	| 1.93 	| 1.93 	| 3.75 	| 3.8 	| 1.9 	| 4 	| 3.75 	| 1.87 	| 3.65 	| 3.75 	| 1.95 	| 4.11 	| 3.84 	| 1.93 	| 4 	| 3.7 	| 1.88 	| 4 	| 3.6 	| 1.9 	| 4.5 	| 3.94 	| 2 	| 4.06 	| 3.77 	| 1.88 	| 1.66 	| 2.2 	| 1.69 	| 2.29 	| 1.74 	| 2.39 	| 1.68 	| 2.21 	| 0.5 	| 2 	| 1.93 	| 2 	| 1.93 	| 2.06 	| 1.95 	| 1.99 	| 1.88 	|
+| I1 	| 21/08/2021 	| 19:45 	| Torino 	| Atalanta 	| 1 	| 2 	| A 	| 0 	| 1 	| A 	| 19 	| 6 	| 8 	| 2 	| 17 	| 13 	| 5 	| 1 	| 2 	| 2 	| 0 	| 0 	| 5.5 	| 4.33 	| 1.55 	| 5 	| 4.25 	| 1.62 	| 5.25 	| 4.3 	| 1.6 	| 5.5 	| 4.25 	| 1.65 	| 5.5 	| 4.2 	| 1.6 	| 5.75 	| 4.2 	| 1.55 	| 5.75 	| 4.48 	| 1.65 	| 5.43 	| 4.23 	| 1.6 	| 1.57 	| 2.37 	| 1.61 	| 2.46 	| 1.61 	| 2.52 	| 1.57 	| 2.43 	| 1 	| 1.89 	| 2.04 	| 1.88 	| 2.06 	| 1.92 	| 2.07 	| 1.87 	| 2 	| 6 	| 4.5 	| 1.5 	| 6.25 	| 4.5 	| 1.5 	| 6 	| 4.5 	| 1.53 	| 6.51 	| 4.5 	| 1.54 	| 6.5 	| 4.2 	| 1.53 	| 6.5 	| 4.33 	| 1.5 	| 6.9 	| 4.75 	| 1.59 	| 6.16 	| 4.48 	| 1.52 	| 1.53 	| 2.5 	| 1.55 	| 2.6 	| 1.63 	| 2.72 	| 1.56 	| 2.45 	| 1 	| 2.06 	| 1.87 	| 2.08 	| 1.85 	| 2.19 	| 1.9 	| 2.03 	| 1.84 	|
+| I1 	| 22/08/2021 	| 17:30 	| Bologna 	| Salernitana 	| 3 	| 2 	| H 	| 0 	| 0 	| D 	| 18 	| 8 	| 7 	| 4 	| 13 	| 15 	| 9 	| 4 	| 6 	| 3 	| 2 	| 1 	| 1.65 	| 4 	| 5 	| 1.67 	| 4 	| 5 	| 1.63 	| 4.1 	| 5.25 	| 1.65 	| 4.29 	| 5.42 	| 1.63 	| 4 	| 5.25 	| 1.62 	| 3.75 	| 5.75 	| 1.7 	| 4.29 	| 5.75 	| 1.65 	| 4.04 	| 5.15 	| 1.8 	| 2 	| 1.8 	| 2.11 	| 1.87 	| 2.11 	| 1.81 	| 2.02 	| -0.75 	| 1.85 	| 2.08 	| 1.84 	| 2.1 	| 1.88 	| 2.1 	| 1.83 	| 2.05 	| 1.5 	| 4.5 	| 6 	| 1.53 	| 4.4 	| 6 	| 1.55 	| 4.3 	| 5.75 	| 1.55 	| 4.52 	| 6.38 	| 1.52 	| 4.33 	| 6.5 	| 1.5 	| 4.2 	| 7 	| 1.59 	| 4.61 	| 7 	| 1.54 	| 4.37 	| 6.05 	| 1.72 	| 2.1 	| 1.72 	| 2.24 	| 1.76 	| 2.37 	| 1.7 	| 2.16 	| -1 	| 1.94 	| 1.99 	| 1.92 	| 2.01 	| 2.02 	| 2.01 	| 1.91 	| 1.95 	|
+| I1 	| 22/08/2021 	| 17:30 	| Udinese 	| Juventus 	| 2 	| 2 	| D 	| 0 	| 2 	| A 	| 11 	| 11 	| 6 	| 4 	| 11 	| 12 	| 3 	| 3 	| 1 	| 3 	| 0 	| 0 	| 7.5 	| 4.33 	| 1.45 	| 7.5 	| 4.5 	| 1.44 	| 7.5 	| 4.4 	| 1.45 	| 7.59 	| 4.48 	| 1.49 	| 7.5 	| 4.2 	| 1.47 	| 8 	| 4.33 	| 1.4 	| 8 	| 4.5 	| 1.53 	| 7.21 	| 4.35 	| 1.47 	| 1.72 	| 2.1 	| 1.79 	| 2.13 	| 1.82 	| 2.15 	| 1.77 	| 2.08 	| 1 	| 2.05 	| 1.75 	| 2.15 	| 1.79 	| 2.15 	| 1.86 	| 2.08 	| 1.79 	| 7 	| 4 	| 1.5 	| 5.75 	| 4.2 	| 1.57 	| 6.75 	| 4.1 	| 1.53 	| 7.45 	| 4.03 	| 1.56 	| 7 	| 4.2 	| 1.5 	| 7.5 	| 3.9 	| 1.5 	| 8.08 	| 4.25 	| 1.59 	| 6.89 	| 4.03 	| 1.53 	| 2.09 	| 1.84 	| 2.08 	| 1.83 	| 2.13 	| 1.95 	| 1.98 	| 1.85 	| 1 	| 1.91 	| 1.99 	| 1.93 	| 1.99 	| 2.01 	| 2 	| 1.93 	| 1.93 	|
+| I1 	| 22/08/2021 	| 19:45 	| Napoli 	| Venezia 	| 2 	| 0 	| H 	| 0 	| 0 	| D 	| 13 	| 8 	| 4 	| 4 	| 5 	| 22 	| 2 	| 2 	| 1 	| 7 	| 1 	| 0 	| 1.22 	| 6.5 	| 12 	| 1.25 	| 6.25 	| 11 	| 1.25 	| 6.5 	| 11 	| 1.25 	| 6.67 	| 12.08 	| 1.24 	| 6 	| 13 	| 1.2 	| 6.5 	| 13 	| 1.28 	| 6.8 	| 13 	| 1.24 	| 6.38 	| 11.79 	| 1.44 	| 2.75 	| 1.44 	| 2.91 	| 1.48 	| 2.95 	| 1.44 	| 2.78 	| -1.75 	| 1.89 	| 2.04 	| 1.87 	| 2.05 	| 1.9 	| 2.05 	| 1.86 	| 2.02 	| 1.2 	| 6.5 	| 13 	| 1.22 	| 6.75 	| 12 	| 1.22 	| 6.75 	| 12 	| 1.22 	| 7.1 	| 13.81 	| 1.2 	| 6.5 	| 15 	| 1.18 	| 6.5 	| 17 	| 1.25 	| 7.25 	| 17 	| 1.22 	| 6.74 	| 12.94 	| 1.4 	| 3 	| 1.43 	| 2.98 	| 1.46 	| 3 	| 1.42 	| 2.87 	| -2 	| 2.04 	| 1.89 	| 2.03 	| 1.88 	| 2.15 	| 1.99 	| 2.03 	| 1.84 	|
+| I1 	| 22/08/2021 	| 19:45 	| Roma 	| Fiorentina 	| 3 	| 1 	| H 	| 1 	| 0 	| H 	| 11 	| 11 	| 6 	| 8 	| 12 	| 14 	| 4 	| 4 	| 3 	| 2 	| 1 	| 1 	| 1.72 	| 3.8 	| 4.75 	| 1.72 	| 4 	| 4.6 	| 1.75 	| 3.95 	| 4.3 	| 1.81 	| 3.96 	| 4.59 	| 1.75 	| 3.8 	| 4.6 	| 1.73 	| 3.7 	| 4.75 	| 1.82 	| 4.03 	| 4.75 	| 1.77 	| 3.85 	| 4.5 	| 1.66 	| 2.2 	| 1.72 	| 2.23 	| 1.76 	| 2.25 	| 1.68 	| 2.2 	| -0.75 	| 2.02 	| 1.91 	| 2.02 	| 1.9 	| 2.02 	| 1.93 	| 1.99 	| 1.88 	| 1.6 	| 4.2 	| 5.25 	| 1.6 	| 4.33 	| 5.25 	| 1.63 	| 4.2 	| 4.9 	| 1.67 	| 4.2 	| 5.31 	| 1.61 	| 4 	| 5.5 	| 1.6 	| 4 	| 5.5 	| 1.71 	| 4.4 	| 5.6 	| 1.65 	| 4.16 	| 5.11 	| 1.61 	| 2.3 	| 1.61 	| 2.44 	| 1.68 	| 2.55 	| 1.61 	| 2.33 	| -0.75 	| 1.85 	| 2.08 	| 1.85 	| 2.08 	| 1.86 	| 2.16 	| 1.82 	| 2.06 	|
 
-The task should check in the excel or csv file if the market is present (it's possible that not exist in excel Db)
-looking by marketName, runner name and date.
+#### TABLE FOR LEAGUE
 
-After found the correct line in excle/csv we should add this data in the market info.
+In addition for soccer we should set the division value based on column A in the found match line
+
+ex: Inter v Juvents -> find in file called I1 under folder 2021-> we put this value in addition football info
+
+```json
+  "league": "Serie A",
+  "countryCode": "ITA",
+  "season": "2020/2021",
+```
+
+Based on this code list
+
+| # 	| code ( columns a in excel, named DIV) 	| leagueName 	| countryCode 	|
+|---	|---	|---	|---	|
+| 1 	| E0 	| Premier League 	| GBR 	|
+| 2 	| E1 	| Championship 	| GBR 	|
+| 3 	| SC0 	| Premier League 	| SCOT 	|
+| 4 	| SC1 	| Division 1 	| SCOT 	|
+| 5 	| D1 	| Budesliga 1 	| GER 	|
+| 6 	| D2 	| Budesliga 2 	| GER 	|
+| 7 	| I1 	| Serie A 	| ITA 	|
+| 8 	| I2 	| Serie B 	| ITA 	|
+| 9 	| SP1 	| La Liga Primera Division  	| ESP 	|
+| 10 	| SP2 	| La Liga Segunda Division 	| ESP 	|
+| 11 	| F1 	| Ligue 1 	| FRA 	|
+| 12 	| F2 	| Ligue 2 	| FRA 	|
+| 13 	| N1 	| Eredivise 	| NLD 	|
+| 14 	| B1 	| Jupiler League  	| BEL 	|
+| 15 	| P1 	| Liga I 	| PRT 	|
+| 16 	| T1 	| Futbol Ligi 1  	| TUR 	|
+| 17 	| G1 	| Ethniki Katigoria 	| GRE 	|
+
+
+### HORSE: 
+ no additional info to add
+
+The task should check in the excel or csv file if the market is present (it's possible that not exist in excel DB)
+If not presnt in db set
+
+```json
+ "additionalInfo":{
+  "tennis": null,
+  "soccer": null,
+  "horse": null,
+ }                                 
+```  
+
+looking by marketName, runner name and date we should find the market in the .csv / .excel
+
+After found the correct line in excel/csv we should add this data in the market info.
 
 NB: I didn't make this part in my code, you have to start from 0. 
-I can suggest you to search in excel the name of the runners in the columns together with the date (a market with 2 same runners and same date is unique) and then copy the columns you find in notes.txt
-chronological
+I can suggest you to search in excel the name of the runners in the columns together with the date (a market with 2 same runners and particular date is always unique) and then copy the data.
 
 
-at end of this proces the complete file should look like this (odds part are ommised)
+At end of this proces the complete file should look like this ( marketUpdates ans odds part are ommised)
 
 ```json
 
@@ -1005,81 +1099,11 @@ at end of this proces the complete file should look like this (odds part are omm
       "inPlay": false,
       "complete": true
     },
-    {
-      "timestamp": 1631334824468000000,
-      "openDate": "2021-09-12T20:00:00.000Z",
-      "status": "OPEN",
-      "betDelay": 0,
-      "inPlay": false,
-      "complete": true
-    },
-    {
-      "timestamp": 1631339930202000000,
-      "openDate": "2021-09-12T20:00:00.000Z",
-      "status": "SUSPENDED",
-      "betDelay": 0,
-      "inPlay": false,
-      "complete": true
-    },
-    {
-      "timestamp": 1631339939435000000,
-      "openDate": "2021-09-12T20:00:00.000Z",
-      "status": "OPEN",
-      "betDelay": 0,
-      "inPlay": false,
-      "complete": true
-    },
-    {
-      "timestamp": 1631476915685000000,
-      "openDate": "2021-09-12T20:15:00.000Z",
-      "status": "OPEN",
-      "betDelay": 0,
-      "inPlay": false,
-      "complete": true
-    },
-    {
-      "timestamp": 1631477521419000000,
-      "openDate": "2021-09-12T20:08:00.000Z",
-      "status": "OPEN",
-      "betDelay": 0,
-      "inPlay": false,
-      "complete": true
-    },
-    {
-      "timestamp": 1631477832479000000,
-      "openDate": "2021-09-12T20:08:00.000Z",
-      "status": "SUSPENDED",
-      "betDelay": 0,
-      "inPlay": false,
-      "complete": true
-    },
-    {
-      "timestamp": 1631477833160000000,
-      "openDate": "2021-09-12T20:08:00.000Z",
-      "status": "OPEN",
-      "betDelay": 3,
-      "inPlay": true,
-      "complete": true
-    },
-    {
-      "timestamp": 1631486006482000000,
-      "openDate": "2021-09-12T20:08:00.000Z",
-      "status": "SUSPENDED",
-      "betDelay": 3,
-      "inPlay": true,
-      "complete": true
-    },
-    {
-      "timestamp": 1631486183103000000,
-      "openDate": "2021-09-12T20:08:00.000Z",
-      "status": "CLOSED",
-      "betDelay": 3,
-      "inPlay": true,
-      "complete": true
-    }
+    ....
+
   ],
   "additionalInfo":{                                            // data added via excel
-      "tennis":{                                                // if is not tennis is null
+      "tennis":{                                                // only for TENNIS, otherwise null
             "tennisTournament":{
                 "location":  "New York",                // columns B
                 "tournament":  "US Open",               // columns C
@@ -1133,7 +1157,10 @@ at end of this proces the complete file should look like this (odds part are omm
                 }
             }
       },
-      "football":{                                     // if is not football is null, this data is based on Inter v Genoa -21/08/2021
+      "football":{                                     // only for SOCCER, otherwise null. This data is based on Inter v Genoa -21/08/2021
+            "league": "Serie A",                      // added previously based on wher path and file found the market
+            "countryCode": "ITA",                      // added previously based on wher path and file found the market
+            "season": "2020/2021",                       // added previously based on wher path and file found the market                  
             "finalResult":{
                 "home": {
                     "fthg": 4,                         // Full Time Home Team Goals -  columns F
@@ -1165,7 +1192,6 @@ at end of this proces the complete file should look like this (odds part are omm
                 "ay": 3,                                // Away Team Yellow Cards - columns U
                 "hr": 0,                                // Home Team Red Cards - columns V
                 "ar": 0,                                // Away Team Red Cards - columns W
-
             },
              "bookOdds": {
                 "bet365":{
@@ -1200,7 +1226,7 @@ at end of this proces the complete file should look like this (odds part are omm
 
 ## 5- check and save JSON
 
-Now we should check that the json file is correct and consistent.
+Now we should check that the json file is correct and consistent and not miss any part.
 Now that the markert JSON is complete we can save that in `code/exportOutput/markets` (for the moment it save all togheter but we can mantain the original path, so divided by sport and types)
 
 * `code/exportOutput/markets/BASIC/SOCCER`
@@ -1213,11 +1239,11 @@ Now that the markert JSON is complete we can save that in `code/exportOutput/mar
 
 ## 6- check and generate RunnerDB
 
-We should start to generate the runnersDB JSON.
+We should start to generate the runnersDB JSON, saving all runners present in the market already saved.
 
-In order to do that we have to save form market info, under runner info
-id: id of the runner
-name: name of the runner
+In order to do that we have to save form markets info in runners props
+* id: id of the runner
+* name: name of the runner
 
 
 ```python
@@ -1231,6 +1257,17 @@ name: name of the runner
         runnersDB.saveRunnersOfMarket(marketList)
 ```
 NB: don't add duplicate runner or runners id that already present in the list
+
+Example:
+```json
+[{"id": 35900675, "name": "Youllovemewheniwin"}, 
+{"id": 36764551, "name": "Kaths Toyboy"}, 
+{"id": 750247, "name": "Strike"}, 
+{"id": 28602170, "name": "Hyde Park Barracks"}, 
+{"id": 39258079, "name": "Mr Professor"},
+....
+]
+```
 
 We should save the JSON list with this filename `code/exportOutput/runner/runnerDB_CURRENTDATE`
 
