@@ -16,10 +16,11 @@ data_BASIC_SOCCER = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversi
 data_BASIC_TENNIS = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/BASIC/TENNIS/'
 data_BASIC_HORSE_RACING = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/BASIC/HORSE RACING/'
 
+
 # have to run for all above folder
 
 # start the routine
-main.main(data_BASIC_HORSE_RACING,workPath,'BASIC')
+main.main(data_ADVANCED_TENNIS,workPath,'ADVANCED')
 
 
 print(' -----  END ADVANCED ----')

@@ -191,8 +191,11 @@ class MarketInfo():
 
         self.info['delay'] = self.marketUpdates[len(self.marketUpdates)-1]['betDelay']
 
-        #if self.info['delay']>3:
-        #    print(tabulate(self.marketUpdates, tablefmt="pipe", headers="keys"))
+
+        #print(self.info['name'])
+        #print(self.info['openDate'])
+        #print(tabulate(self.marketUpdates, tablefmt="pipe", headers="keys"))
+            
 
 
     # update odds for status in updates

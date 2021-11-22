@@ -250,6 +250,8 @@ I convert this `1.1.187528277.json` to a panda dataframe in order to separate al
 
 There will be 2 different types of line:
 
+WE HAVE TO REMOVE ALL THE FILE THAT NOT CONTAINS AT LEST ONE MARKET CHANGE AND HAVE LESS THAT 50 PRICE CHANGES
+
 #### MARKET CHANGES
 This one have "mc" props, inside that "marketDefinition" props and not "rc" props
 
@@ -584,6 +586,8 @@ for elem in self.marketUpdates:
 ### Removing some market
 Now we can save the info about correct openDate and the betDelay time
 
+
+
 There are some rule to remove / skip the market if betDelay are to high
 
 * Tennis --> remove if (betdelay >3 and open date > 2019)
@@ -592,6 +596,9 @@ There are some rule to remove / skip the market if betDelay are to high
 
 And ONLY FOR TENNIS, we should remove match with "/" in event name (all doubles matches, that i don't want in my DB)
 * Tennis --> remove if eventName contains "/" or " / "
+
+
+WE HAVE TO REMOVE ALL THE MARKET NEVER TURNED IN PLAY OR THAT STAY INPLAY LESS THAN 1 MINUTE (FOR FOOTBALL AND TENNIS)
 
 
 ### Improve runner info and odds information
