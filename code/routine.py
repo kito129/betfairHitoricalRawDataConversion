@@ -5,16 +5,16 @@ import time
 
 
 # the path were al files are extracte, you have to sperate file extracted by sport and by type of data
-workPath = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/code/rawInput/'
+workPath = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/code/rawInput/'
 
 # the path were i will place the file to be converted
-data_ADVANCED_SOCCER = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/ADVANCED/SOCCER/'
-data_ADVANCED_TENNIS = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/ADVANCED/TENNIS/'
-data_ADVANCED_HORSE_RACING = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/ADVANCED/HORSE RACING/'
+data_ADVANCED_SOCCER = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/ADVANCED/SOCCER/'
+data_ADVANCED_TENNIS = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/ADVANCED/TENNIS/'
+data_ADVANCED_HORSE_RACING = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/ADVANCED/HORSE RACING/'
 
-data_BASIC_SOCCER = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/BASIC/SOCCER/'
-data_BASIC_TENNIS = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/BASIC/TENNIS/'
-data_BASIC_HORSE_RACING = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/BASIC/HORSE RACING/'
+data_BASIC_SOCCER = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/BASIC/SOCCER/'
+data_BASIC_TENNIS = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/BASIC/TENNIS/'
+data_BASIC_HORSE_RACING = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/BASIC/HORSE RACING/'
 
 # have to run for all above folder
 

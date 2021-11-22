@@ -5,6 +5,13 @@ All material is based on the code contained in /code
 
 I ask that you follow the project specifications strictly, but feel free to make the best changes necessary to make the code robust, reliable, and performant as it will be the basis of a very large project I plan to develop.
 
+The code for the moment logs little data but I would like that for each task done are shown on screen the metrics of each step
+For example:
+Total files to process
+Total corrected files
+Total runners generated
+Eventual errors at run time or raw files not conforming to the specifications
+
 
 
 The following docs index:
@@ -14,17 +21,15 @@ Specification
 * [Other Repo](#other-repo)
 * [Raw Data definition](#raw-data-definition)
 
-
-
-* [Downloading RAW data from Betfair](#other-repo)
-* [Extracting the archives and dividing by sport and data type](#head1234)
-* [Creation of the temporal data frame](#head1234)
-* [Splitting of data and first JSON](#head1234)
-* [Data conversion into specification](#head1234)
-* [Correction of temporal bugs](#head1234)
-* [Save metadata quotas and runners](#head1234)
-* [Runner list creation](#head1234)
-* [Saving and split in folders of final files](#head1234)
+* Downloading RAW data from Betfair
+*  Extracting the archives and dividing by sport and data type
+*  Creation of the temporal data frame
+*  Splitting of data and first JSON
+*  Data conversion into specification
+*  Correction of temporal bugs
+*  Save metadata quotas and runners
+*  Runner list creation
+*  Saving and split in folders of final files
 
 
 ----------------------------
@@ -46,25 +51,24 @@ Some repo and links related to the project
 
 ## Raw Data definition
 
-* [Betfair Docs](https://github.com/marcoselva/dataConversionFiverr/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
+* [Betfair Docs](https://github.com/marcoselva/rawDataConversion/blob/main/documentation/Betfair-Historical-Data-Feed-Specification.pdf)
 
 The database on which we will operate will be purchased from Betfair exchange and will include all the matches on the platform, with information about:
 * The market event information
-* The market updates (event OPEN, SUSPENDED, CLOSEED, the status of inPlay and betDelay..).
+* The market updates (event OPEN, SUSPENDED, CLOSED, the status of inPlay and betDelay..).
 * The runner's information (the competitors of the event) 
 * The odds (price, volume and available prices to bet).
 
 Additional data information ( such as final result, bookmaker odds and some stats) that will be add over a 
-* [Soccer Additional Data](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/SOCCER)
-* [Tennis Additional Data](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/TENNIS)
+* [Soccer Additional Data](https://github.com/marcoselva/rawDataConversion/tree/main/excel/SOCCER)
+* [Tennis Additional Data](https://github.com/marcoselva/rawDataConversion/tree/main/excel/TENNIS)
 
 
 This is a sample of market Djokovic v Medvedev of 12/09/2021
 
-ADVANCED[`1.187528277.bz2.json`](https://github.com/marcoselva/dataConversionFiverr/blob/main/sample/input/1.187528277.bz2.json)
+ADVANCED[`1.187528277.bz2.json`](https://github.com/marcoselva/rawDataConversion/blob/main/sample/input/ADVANCED/1.187528277.bz2.json)
 
-+++++
-BASIC[`1.187528277.bz2.json`](https://github.com/marcoselva/dataConversionFiverr/blob/main/sample/input/1.187528277.bz2.json)
+BASIC[`1.187528277.bz2.json`](https://github.com/marcoselva/rawDataConversion/blob/main/sample/input/BASIC/1.187528277.bz2.json)
 
 
 As you can see this is a list of Market change in the time (pt is published time), and the main propose is to convert this time data in
@@ -82,8 +86,8 @@ Both contain the same information, but
 * BASIC has updates every minute and the only odds information is only timestamp and last traded prices (odds)
 
 ### The raw data folder are
-* [Raw data ADVANCED](https://github.com/marcoselva/dataConversionFiverr/tree/main/rawData/ADVANCED)
-* [Raw data BASIC](https://github.com/marcoselva/dataConversionFiverr/tree/main/rawData/BASIC)
+* [Raw data ADVANCED](https://github.com/marcoselva/rawDataConversion/tree/main/rawData/ADVANCED)
+* [Raw data BASIC](https://github.com/marcoselva/rawDataConversion/tree/main/rawData/BASIC)
 
 each folder contains subfolder
 * /TENNIS
@@ -110,16 +114,16 @@ The market type list you should use
 | 2 	| MATCH_ODDS 	| Match Odds 	| SOCCER 	| winner of the match 	| #3: 2 name of the team and The Draw, ex: Inter, Juventus, The Draw	|
 | 3 	| HALF_TIME 	| Half Time 	| SOCCER 	| winner of the half-time 	| #3: 2 name of the team and The Draw, ex: Inter, Juventus, The Draw	|
 | 4 	| BOTH_TEAMS_TO_SCORE 	| Both teams to Score? 	| SOCCER 	| both teams score at least one goal 	| #2: Yes, No 	|
-| 5 	| OVER_UNDER 05 	| Over/Under 0.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 0.5 Goals, Over 0.5 Goals 	|
-| 6 	| OVER_UNDER 15 	| Over/Under 1.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 1.5 Goals, Over 1.5 Goals 	|
-| 7 	| OVER_UNDER 25 	| Over/Under 2.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 2.5 Goals, Over 2.5 Goals 	|
-| 8 	| OVER_UNDER 35 	| Over/Under 3.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 3.5 Goals, Over 3.5 Goals 	|
-| 9 	| OVER_UNDER 45 	| Over/Under 4.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 4.5 Goals, Over 4.5 Goals 	|
-| 10 	| OVER_UNDER 55 	| Over/Under 5.5 Goals 	| SOCCER 	|  total number of the goals in the match 	| #2: Under 5.5 Goals, Over 5.5 Goals 	|
-| 11 	| FIRST_HALF_GOALS_05 	| First Half Goals 0.5 	| SOCCER 	|  total number of the goals in the half-time 	| #2: Under 0.5 Goals, Over 0.5 Goals 	|
-| 12 	| FIRST_HALF_GOALS_15 	| First Half Goals 1.5 	| SOCCER 	|  total number of the goals in the half-time 	| #2: Under 1.5 Goals, Over 1.5 Goals 	|
-| 13 	| FIRST_HALF_GOALS_25 	| First Half Goals 2.5 	| SOCCER 	|  total number of the goals in the half-time 	| #2: Under 2.5 Goals, Over 2.5 Goals 	|
-| 14 	| FIRST_HALF_GOALS_35 	| First Half Goals 3.5 	| SOCCER 	|  total number of the goals in the half-time 	| #2: Under 3.5 Goals, Over 3.5 Goals 	|
+| 5 	| OVER_UNDER 05 	| Over/Under 0.5 Goals 	| SOCCER 	|  number of the goals in the match 	| #2: Under 0.5 Goals, Over 0.5 Goals 	|
+| 6 	| OVER_UNDER 15 	| Over/Under 1.5 Goals 	| SOCCER 	|  number of the goals in the match 	| #2: Under 1.5 Goals, Over 1.5 Goals 	|
+| 7 	| OVER_UNDER 25 	| Over/Under 2.5 Goals 	| SOCCER 	|  number of the goals in the match 	| #2: Under 2.5 Goals, Over 2.5 Goals 	|
+| 8 	| OVER_UNDER 35 	| Over/Under 3.5 Goals 	| SOCCER 	|  number of the goals in the match 	| #2: Under 3.5 Goals, Over 3.5 Goals 	|
+| 9 	| OVER_UNDER 45 	| Over/Under 4.5 Goals 	| SOCCER 	|  number of the goals in the match 	| #2: Under 4.5 Goals, Over 4.5 Goals 	|
+| 10 	| OVER_UNDER 55 	| Over/Under 5.5 Goals 	| SOCCER 	|  number of the goals in the match 	| #2: Under 5.5 Goals, Over 5.5 Goals 	|
+| 11 	| FIRST_HALF_GOALS_05 	| First Half Goals 0.5 	| SOCCER 	|  number of the goals in the half-time 	| #2: Under 0.5 Goals, Over 0.5 Goals 	|
+| 12 	| FIRST_HALF_GOALS_15 	| First Half Goals 1.5 	| SOCCER 	|  number of the goals in the half-time 	| #2: Under 1.5 Goals, Over 1.5 Goals 	|
+| 13 	| FIRST_HALF_GOALS_25 	| First Half Goals 2.5 	| SOCCER 	|  number of the goals in the half-time 	| #2: Under 2.5 Goals, Over 2.5 Goals 	|
+| 14 	| FIRST_HALF_GOALS_35 	| First Half Goals 3.5 	| SOCCER 	|  number of the goals in the half-time 	| #2: Under 3.5 Goals, Over 3.5 Goals 	|
 | 15 	| CORRECT_SCORE 	| Correct Score 	| SOCCER 	| correct result of the match 	| typical #16 +#3 always present: 0-0, 0-1, 0-2, 0-3, 1-0, 2-0, 3-0, 1-2, 2-1, 3-1, 1-3, 3-2, 2-3,1-1, 2-2, 3-3, Any Other Home Win, Any Other Away Win, Any Other Draw 	|
 | 16 	| MATCH_ODDS 	| Match Odds 	| TENNIS 	| winner of the match 	| #2: the player Name ex. Novak Djokovic, Daniil Medvedev 	|
 
@@ -163,16 +167,16 @@ The current code start with placing the correct folder to analyze in the path (w
 ```python
 
 # the path were al files are extracted, you have to sperate file extracted by sport and by type of data
-workPath = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/code/rawInput/'
+workPath = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/code/rawInput/'
 
 # the path were i will place the file to be converted
-data_ADVANCED_SOCCER = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/ADVANCED/SOCCER/'
-data_ADVANCED_TENNIS = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/ADVANCED/TENNIS/'
-data_ADVANCED_HORSE_RACING = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/ADVANCED/HORSE RACING/'
+data_ADVANCED_SOCCER = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/ADVANCED/SOCCER/'
+data_ADVANCED_TENNIS = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/ADVANCED/TENNIS/'
+data_ADVANCED_HORSE_RACING = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/ADVANCED/HORSE RACING/'
 
-data_BASIC_SOCCER = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/BASIC/SOCCER/'
-data_BASIC_TENNIS = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/BASIC/TENNIS/'
-data_BASIC_HORSE_RACING = 'D:/00_PROJECTs/40_betfair/dataCreationFiver/dataConversionFiverr/rawData/BASIC/HORSE RACING/'
+data_BASIC_SOCCER = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/BASIC/SOCCER/'
+data_BASIC_TENNIS = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/BASIC/TENNIS/'
+data_BASIC_HORSE_RACING = 'D:/00_PROJECTs/40_betfair/rawDataConversion/rawDataConversion/rawData/BASIC/HORSE RACING/'
 
 # have to run for all above folder
 
@@ -912,8 +916,8 @@ After this pass we should save this info in file, with improved runner info that
 As i said now the market info from Betfair is complete, but in order to have a complete DB we have to add some info form this file
 
 ### Tennis Data
-* [TENNIS ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/TENNIS)
-* [TENNIS ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/excel/TennisNotes.txt)
+* [TENNIS ADDITIONAL DATA](https://github.com/marcoselva/rawDataConversion/tree/main/excel/TENNIS)
+* [TENNIS ADDITIONAL SPECS](https://github.com/marcoselva/rawDataConversion/blob/main/excel/TennisNotes.txt)
 
 | ATP 	| B 	| C 	| D 	| E 	| F 	| G 	| H 	| I 	| J 	| K 	| L 	| M 	| N 	| O 	| P 	| Q 	| R 	| S 	| T 	| U 	| V 	| W 	| X 	| Y 	| Z 	| AA 	| AB 	| AC 	| AD 	| AE 	| AF 	| AG 	| AH 	| AI 	| AJ 	|
 |---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|
@@ -945,8 +949,8 @@ If found in WTA excel under 2020 folder so:
 
 ### Soccer Data
 
-* [SOCCER ADDITIONAL DATA](https://github.com/marcoselva/dataConversionFiverr/tree/main/excel/SOCCER)
-* [SOCCER ADDITIONAL SPECS](https://github.com/marcoselva/dataConversionFiverr/blob/main/excel/SoccerNotes.txt)
+* [SOCCER ADDITIONAL DATA](https://github.com/marcoselva/rawDataConversion/tree/main/excel/SOCCER)
+* [SOCCER ADDITIONAL SPECS](https://github.com/marcoselva/rawDataConversion/blob/main/excel/SoccerNotes.txt)
 
 | A 	| B 	| C 	| D 	| E 	| F 	| G 	| H 	| I 	| J 	| K 	| L 	| M 	| N 	| O 	| P 	| Q 	| R 	| S 	| T 	| U 	| V 	| W 	| X 	| Y 	| Z 	| AA 	| AB 	| AC 	| AD 	| AE 	| AF 	| AG 	| AH 	| AI 	| AJ 	| AK 	| AL 	| AM 	| AN 	| AO 	| AP 	| AQ 	| AR 	| AS 	| AT 	| AU 	| AV 	| AW 	| AX 	| AY 	| AZ 	| BA 	| BB 	| BC 	| BD 	| BE 	| BF 	| BG 	| BH 	| BI 	| BJ 	| BK 	| BL 	| BM 	| BN 	| BO 	| BP 	| BQ 	| BR 	| BS 	| BT 	| BU 	| BV 	| BW 	| BX 	| BY 	| BZ 	| CA 	| CB 	| CC 	| CD 	| CE 	| CF 	| CG 	| CH 	| CI 	| CJ 	| CK 	| CL 	| CM 	| CN 	| CO 	| CP 	| CQ 	| CR 	| CS 	| CT 	| CU 	| CV 	| CW 	| CX 	| CY 	| CZ 	| DA 	|
 |---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|---	|
@@ -1227,6 +1231,7 @@ At end of this proces the complete file should look like this ( marketUpdates an
 ## 5- check and save JSON
 
 Now we should check that the json file is correct and consistent and not miss any part.
+
 Now that the markert JSON is complete we can save that in `code/exportOutput/markets` (for the moment it save all togheter but we can mantain the original path, so divided by sport and types)
 
 * `code/exportOutput/markets/BASIC/SOCCER`
