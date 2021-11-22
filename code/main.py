@@ -37,7 +37,7 @@ def main(rawDataPath, workPath, dataType):
     # ##
     print('\n\n------ 1 -EXTRACTION------ \n\n')
     # extract all raw data in workPath
-    #decompress.extractJson(rawDataPath, workPath)
+    decompress.extractJson(rawDataPath, workPath)
   
 
     # ##
