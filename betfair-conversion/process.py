@@ -38,8 +38,6 @@ def process_json(path: Path) -> Optional[MarketInfo]:
     ) or (info["sport"] == "FOOTBALL" and info["delay"] > 7)
             or (info["sport"] == "TENNIS" and "/" in info["eventName"])):
         return None
-    if info["sport"] == "TENNIS":
-        return obj
     market_json_path.parent.mkdir(parents=True, exist_ok=True)
     with open(market_json_path, "w") as market_json_file:
         json.dump(vars(obj), market_json_file)
