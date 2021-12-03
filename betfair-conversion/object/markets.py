@@ -17,6 +17,7 @@ class MarketInfo:
         lastMarketUpdate = obj['data'][len(obj['data']) - 1]
 
         #convert open date to unix time in ms
+        # TODO to fix this should be timestamp in ms too
         openDate = int(datetime.fromisoformat(lastMarketUpdate[4][:-1]).timestamp()) *1000000000
 
 
@@ -100,7 +101,7 @@ class MarketInfo:
 
     # calculate sport based on runners number and if is present the draw
     def setSport(self, runners):
-
+        # TODO remove and set sport based on folder path name
         if (runners.runnerCount == 2):
 
             # 2 market
@@ -167,12 +168,13 @@ class MarketInfo:
                 inPlayTime = int(elem['timestamp'])
                 break
 
+        # TODO to fix this should be timestamp in ms too
         self.info['openDate'] = int(inPlayTime / 1000000)
         self.info['delay'] = self.marketUpdates[len(self.marketUpdates)-1]['betDelay']
 
     # update odds for status in updates
     def updateRunnersStats(self):
-
+        # TODO is possible to improve that function?
         inPlay = self.info['openDate']
         runners = self.runners
         odds = self.odds
@@ -202,6 +204,7 @@ class MarketInfo:
                             # avg runner prematch odd
                             if stepCounter < inPlayindex:
                                 # check if max prematch
+                                # TODO check if prematch have at least one value, instead set max and min  = null
                                 if _odd['ltp'] > maxPrematch:
                                     maxPrematch = _odd['ltp']
                                 # check if min prematch
@@ -216,6 +219,7 @@ class MarketInfo:
                                 # set the first inplay ltp as inPlayOdds
                                 if not found:
                                     # volume for ADVANCED only (check volume)
+                                    # TODO check if prematch have at least one value, instead set preMatchVolume =0
                                     if self.status == 'ADVANCED':
                                         preMatchVolume = _odd['tv']
                                     # inPlay time and odds
@@ -278,7 +282,7 @@ class MarketInfo:
 
     # find inPlay index for this runner
     def _find_inPlay_index(self, runnerOdds, inPlayTime):
-
+        # TODO is possible to improve that function?
         counter = 0
         minCounter = -1
         for value in runnerOdds['odds']:
@@ -315,7 +319,7 @@ class MarketUpdate:
             timeStamp = int(up[0].value)
             self.marketUpdate.append({
                 "timestamp": timeStamp,
-                # to fix this should be time too
+                # TODO to fix this should be timestamp in ms too
                 "openDate": up[4],
                 "status": up[5],
                 "betDelay": up[8],

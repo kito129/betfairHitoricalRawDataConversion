@@ -160,6 +160,8 @@ def get_prices_dataframe(path, status):
         columns = ['publish_time', 'runner_id', 'runner_name', 'odds', 'tv', 'trd', 'batb', 'batl', 'sortPriority']
         prices_df_long = prices_df_long.reindex(columns=prices_df_long.columns.union(["trd"]))
 
+    # raised exception never caught
+
     try:
         prices_df_long = prices_df_long[columns]
     except KeyError as e:

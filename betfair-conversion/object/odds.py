@@ -28,6 +28,7 @@ class Odds():
             for runner in myData:
 
                 if runner['runnerId'] == odds[1] and odds[3]>1 :
+                    # TODO to fix this should be timestamp in ms too
                     time = int(odds[0].value / 1000000)
 
                     # BASIC data
@@ -40,6 +41,7 @@ class Odds():
                     # ADVANCED data
                     elif status == 'ADVANCED':
 
+                        # TODO if some value use null and not NaN
                         tempOdds = {
                             "timestamp": time,
                             "ltp": odds[3],
