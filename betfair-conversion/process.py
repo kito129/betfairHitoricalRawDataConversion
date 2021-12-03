@@ -40,7 +40,7 @@ def process_json(path: Path) -> Optional[MarketInfo]:
         return None
     market_json_path.parent.mkdir(parents=True, exist_ok=True)
     with open(market_json_path, "w") as market_json_file:
-        json.dump(vars(obj), market_json_file, indent=4)
+        json.dump(vars(obj), market_json_file, indent=4, allow_nan=False)
 
     return obj
 
