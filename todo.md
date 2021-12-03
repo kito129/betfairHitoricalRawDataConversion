@@ -1,33 +1,33 @@
 # TODO
 - [ ] please use a variable where I can change all times the path to my folder in other HD where I have all raw file (as a string), cause isn't always the same -- rawData
-- [ ]the same with output folder, please use a variable where I can past everytime the correct output folder (as a string) --- exportOutput
-- [ ]uniform soccer and football name, use always SOCCER terms
-- [ ]uniform time, when you have to do with data or time please convert always in UTC millisecond timestamp (marketInfo.openDate, in marketUpdate.timeStamp and marketUpdate.openDate, and in odds timestamp too  )
-- [ ]as I said yesterday please fix venue and county code where is present ( venue only for HORSE)
-
-
-- [ ]at the end of the process please empty all temp folder (rawInput)
-- [ ]create a "exportOutput" with date and time in the path so if I run more than one time at day I didn't override the output Data
-- [ ]in runner DB when add runner please set the sport to, (ex. {"id": 28602170, "name": "Hyde Park Barracks", "sport":"HORSE"}, {"id": 39258079, "name": "Inter Milan", "sport":"SOCCER"}, {"id": 56598184, "name": "Novak Djokovic", "sport":"TENNIS"})
-- [ ]when check last market update to save the market info, if STATUS == "REMOVED" just skip the market
-
-- [ ]for runner DB files please save with time too (date and time), cause if run the script 2 times a day it will be replaced
-- [ ]for runner DB just save: id, name and sport (not all metadata of the odds)
-
-- [ ]in marketUpdate remove "complete" proprieties, I don't need that
-- [ ]change all NaN to null (NaN is not a valid JSON)
-- [ ]I want to add OTHER sport, so if a market is under /ADVANCED/OTHER or /BASIC/OTHER  just set the sport to OTHER and not add any additional info form excel
-
-
-- [ ]it doesn't remove some TENNIS market with marketName contains "/" inside (ex. "Bara/Gorgodze v Piter/Sherif" is still present in output)
-- [ ]the code already use by code to divide the sport (checkTennis and other functions) remove that and set sport based on where the market is placed in path (the code set HORSE for correct score market because have 16 runners, but is SOCCER )
-
-
-- [ ]log the time elapsed for every task
-- [ ]log info about how much market are generate, divided by sport and type (BASIC / ADVANCED)
-
-
-- [ ]change the props name to this ones
+- [ ] the same with output folder, please use a variable where I can past everytime the correct output folder (as a string) --- exportOutput
+- [ ] uniform soccer and football name, use always SOCCER terms
+- [ ] uniform time, when you have to do with data or time please convert always in UTC millisecond timestamp (marketInfo.openDate, in marketUpdate.timeStamp and marketUpdate.openDate, and in odds timestamp too  )
+- [ ] as I said yesterday please fix venue and county code where is present ( venue only for HORSE)
+ 
+ 
+- [ ] at the end of the process please empty all temp folder (rawInput)
+- [ ] create a "exportOutput" with date and time in the path so if I run more than one time at day I didn't override the output Data
+- [ ] in runner DB when add runner please set the sport to, (ex. {"id": 28602170, "name": "Hyde Park Barracks", "sport":"HORSE"}, {"id": 39258079, "name": "Inter Milan", "sport":"SOCCER"}, {"id": 56598184, "name": "Novak Djokovic", "sport":"TENNIS"})
+- [ ] when check last market update to save the market info, if STATUS == "REMOVED" just skip the market
+ 
+- [ ] for runner DB files please save with time too (date and time), cause if run the script 2 times a day it will be replaced
+- [ ] for runner DB just save: id, name and sport (not all metadata of the odds)
+ 
+- [ ] in marketUpdate remove "complete" proprieties, I don't need that
+- [ ] change all NaN to null (NaN is not a valid JSON)
+- [ ] I want to add OTHER sport, so if a market is under /ADVANCED/OTHER or /BASIC/OTHER  just set the sport to OTHER and not add any additional info form excel
+ 
+ 
+- [ ] it doesn't remove some TENNIS market with marketName contains "/" inside (ex. "Bara/Gorgodze v Piter/Sherif" is still present in output)
+- [ ] the code already use by code to divide the sport (checkTennis and other functions) remove that and set sport based on where the market is placed in path (the code set HORSE for correct score market because have 16 runners, but is SOCCER )
+ 
+ 
+- [ ] log the time elapsed for every task
+- [ ] log info about how much market are generate, divided by sport and type (BASIC / ADVANCED)
+ 
+ 
+- [ ] change the props name to this ones
 ```json
 {
   "marketType": "ADVANCED",
