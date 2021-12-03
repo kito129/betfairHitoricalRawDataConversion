@@ -1,32 +1,40 @@
 # TODO
-* please use a variable where I can change all times the path to my folder in other HD where i have all raw file (as a string), cause itsn't always the same -- rawData
+* please use a variable where I can change all times the path to my folder in other HD where I have all raw file (as a string), cause isn't always the same -- rawData
 * the same with output folder, please use a variable where I can past everytime the correct output folder (as a string) --- exportOutput
 * uniform soccer and football name, use always SOCCER terms
 * uniform time, when you have to do with data or time please convert always in UTC millisecond timestamp (marketInfo.openDate, in marketUpdate.timeStamp and marketUpdate.openDate, and in odds timestamp too  )
-* as i said yesterday please fix venue and county code where is present ( venue only for HORSE)
-* log info about how much market are generate, divided by sport and type (BASIC / ADVANCED)
+* as I said yesterday please fix venue and county code where is present ( venue only for HORSE)
+ 
+* at the end of the process please empty all temp folder (rawInput)
+* create a "exportOutput" with date and time in the path so if I run more than one time at day I didn't override the output Data
 * in runner DB when add runner please set the sport to, (ex. {"id": 28602170, "name": "Hyde Park Barracks", "sport":"HORSE"}, {"id": 39258079, "name": "Inter Milan", "sport":"SOCCER"}, {"id": 56598184, "name": "Novak Djokovic", "sport":"TENNIS"})
 * when check last market update to save the market info, if STATUS == "REMOVED" just skip the market
-* at the end of the process please empty all temp folder (rawInput)
-* for runner DB files please save with time too, cause if run the script 2 times a day it will be replaced
+
+* for runner DB files please save with time too (date and time), cause if run the script 2 times a day it will be replaced
 * for runner DB just save: id, name and sport (not all metadata of the odds)
-* in marketUpdate remove "complete" proprieties, i don't need that
-* change all NaN to null please
-* I want to add OTHER sport, so if a market is under /ADVANCED/OTHER or /BASIC/OTHER  just set the sport to OTHER and not add any additional info form excel 
+
+* in marketUpdate remove "complete" proprieties, I don't need that
+* change all NaN to null (NaN is not a valid JSON)
+* I want to add OTHER sport, so if a market is under /ADVANCED/OTHER or /BASIC/OTHER  just set the sport to OTHER and not add any additional info form excel
+
+* it doesn't remove some TENNIS market with marketName contains "/" inside (ex. "Bara/Gorgodze v Piter/Sherif" is still present in output)
+* the code already use by code to divide the sport (checkTennis and other functions) remove that and set sport based on where the market is placed in path (the code set HORSE for correct score market because have 16 runners, but is SOCCER )
+
 * log the time elapsed for every task
-* the code already use by code to divide the sport (checkTennis and other functions) remove that and set sport based on where the market is placed in path (the code set HORSE for correct score market beacusa have 16 runners, but is SOCCER )
+* log info about how much market are generate, divided by sport and type (BASIC / ADVANCED)
+
 
 * change the props name to this ones
 ```json
 {
-  "type": "ADVANCED",
+  "marketType": "ADVANCED",
   "marketInfo": {},
-  "marketRunners": [....],
-  "marketUpdates": [....],
+  "marketRunners": [],
+  "marketUpdates": [],
   "marketOdds": [
     {
       "runnerId": 305969,
-      "odd": [.....]
+      "odd": []
     }
   ]
 }
@@ -34,7 +42,7 @@
 ```
 
 # ERROR
-* 1 - happens this error, please check and fix it (note: if batl, batb, tr or other value is not present in raw just leave it NaN), nut mantaine the strucure of JSON
+* 1 - happens this error, please check and fix it (note: if batl, batb, tr or other value is not present in raw just leave it NaN), but maintain the structure of JSON
   ```
   Traceback (most recent call last):
     File "M:\03_PROJECT\04_BF\rawDataConversion\betfair-conversion\routine.py", line 19, in <module>
@@ -48,7 +56,7 @@
   KeyError: "['batl'] not in index"
     ```
   
-* 2 - a different output but i think the same error
+* 2 - a different output but I think the same error
  ```
  JSON Files ━╺━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1691/65682   3% 0:39:422021-12-03 15:44:49.5372021-12-03 15:44:49.538 |  | ERROR   ERROR    |  | dataframedataframe::get_prices_dataframeget_prices_dataframe::166166 -  - A PRICE error occurred2021-12-03 15:44:49.584A PRICE error occurred
  | 
@@ -106,4 +114,4 @@ Traceback (most recent call last):
 KeyError: "['batl'] not in index"
 
   ```
-NOTE: use as much as possible try and catch so if happens some problems with some market, just skip that and continue with others, to not interrupt the code (i want to start that and leave to process during night, so it will be soo annoying if I have to control all the time the execution  ) , and save in a list called marketError.json the market id and the path of all market that have some error inside
+NOTE: use as much as possible try and catch so if happens some problems with some market, just skip that and continue with others, to not interrupt the code (I want to start that and leave to process during night, so it will be soo annoying if I have to control all the time the execution  ) , and save in a list called marketError.json the market id and the path of all market that have some error inside
