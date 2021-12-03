@@ -214,7 +214,7 @@ def convert_to_obj(dataframe, status):
     mainRunners = Runners(marketSelections)
     mainMarket.setRunners(mainRunners)
 
-    # update market sports, TO FIX here we don't need this function cause sport no is determined by folder name where the file is placed
+    # TODO update market sports, TO FIX here we don't need this function cause sport no is determined by folder name where the file is placed
     mainMarket.setSport(mainRunners)
 
     # odds --> 3/3 part of object
