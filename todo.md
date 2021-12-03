@@ -81,6 +81,47 @@ NOTE: use as much as possible try expect so if happens some problems with some m
 - [ ] set a variable where I can change all times the rawData path, cause isn't always the same -- rawData = "M:\05_BF_DATA\DATA" (string)
 - [ ] the same with output folder, please use a variable where I can past everytime the correct output folder (as a string) --- exportOutput rawData = "M:\05_BF_DATA\EXPORT\LAST" (string)
 - [ ] create a "exportOutput" folder with date and time in the path so if I run more than one time at day it doesn't override the output Data
+
+if is possible to create a setting file, something like this...
+  ```python
+  from pathlib import Path
+
+
+BASE_DIR = Path(__file__).resolve(True).parent.parent
+
+
+# the path were al files are extract, you have to separate file extracted by sport and by type of data
+# Destination DATA files locations
+class PathConfig:
+    # WORK_DIR = BASE_DIR / "code/rawInput/"
+    WORK_DIR = BASE_DIR / "code/rawInput/"
+
+    DATA_ADVANCED_SOCCER = WORK_DIR / 'ADVANCED/SOCCER/'
+    DATA_ADVANCED_TENNIS = WORK_DIR / 'ADVANCED/TENNIS/'
+    DATA_ADVANCED_HORSE_RACING = WORK_DIR / 'ADVANCED/HORSE RACING/'
+
+    DATA_BASIC_SOCCER = WORK_DIR / "BASIC/SOCCER/"
+    DATA_BASIC_TENNIS = WORK_DIR / "BASIC/TENNIS/"
+    DATA_BASIC_HORSE_RACING = WORK_DIR / "BASIC/HORSE RACING/"
+
+    # RAW files locations
+    RAW_DATA_DIR = BASE_DIR / "rawData"
+
+    RAW_DATA_ADVANCED_SOCCER = RAW_DATA_DIR / 'ADVANCED/SOCCER/'
+    RAW_DATA_ADVANCED_TENNIS = RAW_DATA_DIR / 'ADVANCED/TENNIS/'
+    RAW_DATA_ADVANCED_HORSE_RACING = RAW_DATA_DIR / 'ADVANCED/HORSE RACING/'
+
+    RAW_DATA_BASIC_SOCCER = RAW_DATA_DIR / 'BASIC/SOCCER/'
+    RAW_DATA_BASIC_TENNIS = RAW_DATA_DIR / 'BASIC/TENNIS/'
+    RAW_DATA_BASIC_HORSE_RACING = RAW_DATA_DIR / 'BASIC/HORSE RACING/'
+
+    # RAW files locations
+    EXPORT_DIR = BASE_DIR / "export"
+```
+
+
+
+
 - [ ] I want to add OTHER sport, so if a market is under /ADVANCED/OTHER or /BASIC/OTHER  just set the sport to OTHER and not add any additional info form excel
 ### CONSISTENCY
 - [ ] uniform time, when you have to do with data or time please convert always in UTC millisecond timestamp (marketInfo.openDate, in marketUpdate.timeStamp and marketUpdate.openDate, and in odds timestamp too  )
