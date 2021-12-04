@@ -1,3 +1,7 @@
+# Errors
+- [x] Missing columns, e.g. batl
+- [x] Errors loading/dumping NaNs in JSON
+
 # TODO
 
 ## IMPORTANT
