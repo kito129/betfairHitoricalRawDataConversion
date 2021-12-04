@@ -51,6 +51,35 @@ class PathConfig:
 
 
 - [ ] I want to add OTHER sport, so if a market is under /ADVANCED/OTHER or /BASIC/OTHER  just set the sport to OTHER and not add any additional info form excel
+
+- [ ] change the props name to this ones
+```json
+{
+  "marketType": "ADVANCED",
+  "marketInfo": {},
+  "marketRunners": [],
+  "marketUpdates": [],
+  "marketOdds": [
+    {
+      "runnerId": 305969,
+      "odd": []
+    }
+  ]
+}
+       
+```
+
+- [ ] It doesn't process all market for soccer, run only over correct score matchOdds and halfTime, missing all Under Over
+
+
+Input
+![img.png](img.png)
+
+Output missing market form 202 to 206
+![img_1.png](img_1.png)
+
+
+
 ### CONSISTENCY
 - [ ] uniform time, when you have to do with data or time please convert always in UTC millisecond timestamp (marketInfo.openDate, in marketUpdate.timeStamp and marketUpdate.openDate, and in odds timestamp too  )
 - [ ] uniform soccer and football name, use always SOCCER terms
@@ -73,20 +102,3 @@ class PathConfig:
 - [ ] log info about how much market are generate, divided by sport and type (BASIC / ADVANCED)
  
  
-- [ ] change the props name to this ones
-```json
-{
-  "marketType": "ADVANCED",
-  "marketInfo": {},
-  "marketRunners": [],
-  "marketUpdates": [],
-  "marketOdds": [
-    {
-      "runnerId": 305969,
-      "odd": []
-    }
-  ]
-}
-       
-```
-
