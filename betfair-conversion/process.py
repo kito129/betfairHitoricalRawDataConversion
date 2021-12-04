@@ -6,6 +6,7 @@ from typing import Optional
 
 from loguru import logger
 import pandas as pd
+import simplejson as json
 
 from dataframe import create_main_dataframe, convert_to_obj
 from object.markets import MarketInfo
@@ -40,7 +41,7 @@ def process_json(path: Path) -> Optional[MarketInfo]:
         return None
     market_json_path.parent.mkdir(parents=True, exist_ok=True)
     with open(market_json_path, "w") as market_json_file:
-        json.dump(vars(obj), market_json_file, indent=4, allow_nan=False)
+        json.dump(vars(obj), market_json_file, indent=4, ignore_nan=True)
 
     return obj
 
@@ -63,4 +64,4 @@ def process_all_json(json_paths: list[Path]):
     runners_path = Path(f"exportOutput/runner/runnerDB_{today.strftime('%Y-%m-%d')}.json")
     runners_path.parent.mkdir(parents=True, exist_ok=True)
     with open(runners_path, "w") as runners_file:
-        json.dump(runners_db.runners, runners_file)
+        json.dump(runners_db.runners, runners_file, indent=4, ignore_nan=True)
