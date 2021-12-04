@@ -106,8 +106,7 @@ def get_market_dataframe(path):
         markets_df = (pd.DataFrame.from_records(markets)
             .assign(publish_time=lambda df: pd.to_datetime(df['clk'], unit='ms'))
         [['publish_time', 'id', 'eventId', 'marketType', 'openDate', 'status', 'eventName', 'name', 'betDelay',
-          'inPlay',
-          'complete', 'numberOfActiveRunners', 'version']])
+          'inPlay', 'numberOfActiveRunners', 'version']])
         # missing venue and country code cause in some file it could not be present,
         # so we have to check before if present and than save this value
 
