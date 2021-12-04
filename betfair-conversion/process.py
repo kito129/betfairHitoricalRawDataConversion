@@ -33,8 +33,7 @@ def process_json(path: Path) -> Optional[MarketInfo]:
     if obj.status == "REMOVED":
         return None
     open_date = datetime.fromtimestamp(info["openDate"] / 1000)
-    # TODO: WE HAVE TO REMOVE ALL THE MARKET NEVER TURNED IN PLAY OR THAT STAY INPLAY LESS THAN 1 MINUTE
-    #  (FOR FOOTBALL AND TENNIS)
+    # TODO: WE HAVE TO REMOVE ALL THE MARKET NEVER TURNED IN PLAY (FOR FOOTBALL AND TENNIS)
     if ((info["sport"] == "TENNIS" and (
             (open_date.year > 2019 and info["delay"] > 3)
             or (open_date.year < 2019 and info["delay"] > 5))
