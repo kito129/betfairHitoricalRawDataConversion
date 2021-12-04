@@ -30,6 +30,8 @@ def process_json(path: Path) -> Optional[MarketInfo]:
     frame["market"] = remove_market_duplicates(frame["market"])
     obj = convert_to_obj(frame, status)
     info = obj.info
+    if obj.status == "REMOVED":
+        return None
     open_date = datetime.fromtimestamp(info["openDate"] / 1000)
     # TODO: WE HAVE TO REMOVE ALL THE MARKET NEVER TURNED IN PLAY OR THAT STAY INPLAY LESS THAN 1 MINUTE
     #  (FOR FOOTBALL AND TENNIS)

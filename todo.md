@@ -61,7 +61,7 @@ class PathConfig:
 - [x] in runner DB when add runner please set the sport to, (ex. {"id": 28602170, "name": "Hyde Park Barracks", "sport":"HORSE"}, {"id": 39258079, "name": "Inter Milan", "sport":"SOCCER"}, {"id": 56598184, "name": "Novak Djokovic", "sport":"TENNIS"})
 - [x] for runner DB files please save with time too (date and time), cause if run the script 2 times a day it will be replaced
 ### FIX
-- [ ] when check last market update to save the market info, if STATUS == "REMOVED" just skip the market
+- [x] when check last market update to save the market info, if STATUS == "REMOVED" just skip the market
 - [x] in marketUpdate remove "complete" proprieties, I don't need that
 - [x] change all NaN to null (NaN is not a valid JSON)
 - [ ] it doesn't remove some TENNIS market with marketName contains "/" inside (ex. "Bara/Gorgodze v Piter/Sherif" is still present in output)

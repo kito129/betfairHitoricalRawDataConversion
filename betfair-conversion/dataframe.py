@@ -111,8 +111,9 @@ def get_market_dataframe(path):
         # so we have to check before if present and than save this value
 
         # print("Correctly get market info dataframe..")
-    except KeyError:
-        raise Exception('A MARKET INFO error occurred')
+    except KeyError as e:
+        logger.error('A MARKET INFO error occurred')
+        raise e
 
     return markets_df
 

@@ -67,35 +67,30 @@ class MarketInfo:
 
     # save market updates in object
     def setMarketUpdates(self, updates):
-
         self.marketUpdates = updates.marketUpdate
 
     # add runners in market info
     def setRunners(self, runners):
-
         if len(runners.winner) > 0:
             tempWinner = {
-
                 "id": runners.winner[1],
                 "name": runners.winner[2],
                 "status": runners.winner[0],
                 "position": runners.winner[3],
-
             }
             self.info['winner'] = tempWinner
 
         count = 0
-        for runn in runners.runners:
+        for run_arr in runners.runners:
             run = {
-
-                "id": runn[1],
-                "name": runn[2],
-                "status": runn[0],
-                "position": runn[3],
+                "id": run_arr[1],
+                "name": run_arr[2],
+                "status": run_arr[0],
+                "position": run_arr[3],
 
             }
-            count = count + 1
             self.runners.append(run)
+            count += 1
 
         self.info['numberOfActiveRunner'] = count
 
@@ -103,54 +98,39 @@ class MarketInfo:
     def setSport(self, runners):
         # TODO remove and set sport based on folder path name
         if (runners.runnerCount == 2):
-
             # 2 market
             # check if tennis
-            if (self._check_tennis(runners)):
+            if self._check_tennis(runners):
                 self.info['sport'] = "TENNIS"
-
                 pass
-        elif (runners.runnerCount == 3):
-
+        elif runners.runnerCount == 3:
             # possible football, check is the draw
             # check if footbla
-            if (self._check_football(runners)):
+            if self._check_football(runners):
                 self.info['sport'] = "FOOTBALL"
-
                 pass
         else:
-
             self.info['sport'] = "HORSE RACING"
-
             pass
 
     # return true for tennis spec of runners
     def _check_tennis(self, runners):
-
         for run in runners.runners:
-
-            if (("The Draw" in str(run[2])) or ("over" in str(run[2])) or ("under" in str(run[2]))):
+            if ("The Draw" in str(run[2])) or ("over" in str(run[2])) or ("under" in str(run[2])):
                 return False
-
             pass
-
         return True
 
     # return true for football spec of runners
     def _check_football(self, runners):
-
         for run in runners.runners:
-
-            if (("The Draw" in str(run[2]))):
+            if ("The Draw" in str(run[2])):
                 return True
-
             pass
-
         return False
 
     # update object filed with passed odds main obj
     def setOdds(self, odds):
-
         self.odds = odds
         # order odds by timestamp
         for lista in self.odds:
