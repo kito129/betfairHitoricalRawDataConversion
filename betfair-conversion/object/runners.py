@@ -1,5 +1,8 @@
-import pprint
-import json
+from os import PathLike
+
+import simplejson as json
+
+from markets import MarketInfo
 
 
 # ##
@@ -26,23 +29,6 @@ class Runners:
             pass
         self.runnerCount = count
 
-# save runners list in JSON
-def _save_runners_to_JSON(runnersList, path):
-    print("Saving runners list in " + str(path) + "\n\n")
-
-    with open(path, 'w') as outfile:
-        json.dump(runnersList, outfile)
-
-
-# read JSON runners list and return the object
-def _read_JSON_runners(path):
-    print("Reading runners list in " + str(path) + "\n\n")
-
-    with open(path) as json_file:
-        data = json.load(json_file)
-
-    return data
-
 
 class RunnersDB:
     # empty constructor
@@ -50,12 +36,16 @@ class RunnersDB:
         self.runners = {}
 
     # iterate over runner of this match and check if it's present
-    def save_market(self, market):
+    def save_market(self, market: MarketInfo):
         for runner in market.runners:
             runner_id = runner["id"]
             if not self.contains(runner_id):
-                self.runners[runner_id] = runner
+                self.runners[runner_id] = {"id": runner["id"], "name": runner["name"], "sport": market.info["sport"]}
 
     # get runner if present, -1 if is not present
-    def contains(self, runner_id):
+    def contains(self, runner_id: int):
         return runner_id in self.runners
+
+    def save(self, path: PathLike):
+        with open(path, "w") as runners_file:
+            json.dump(list(self.runners.values()), runners_file, indent=4, ignore_nan=True)

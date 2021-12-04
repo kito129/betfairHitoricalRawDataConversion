@@ -60,8 +60,6 @@ def process_all_json(json_paths: list[Path]):
                 if market:
                     runners_db.save_market(market)
 
-    today = date.today()
-    runners_path = Path(f"exportOutput/runner/runnerDB_{today.strftime('%Y-%m-%d')}.json")
+    runners_path = Path(f"exportOutput/runner/runnerDB_{date.today().strftime('%Y-%m-%d')}.json")
     runners_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(runners_path, "w") as runners_file:
-        json.dump(runners_db.runners, runners_file, indent=4, ignore_nan=True)
+    runners_db.save(runners_path)

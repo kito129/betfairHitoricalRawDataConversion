@@ -57,7 +57,7 @@ class PathConfig:
 - [ ] fix venue and countyCode where is present ( venue only for HORSE)
 - [ ] at the end of the process please empty all temp folder (rawInput)
 ### RUNNER DB
-- [ ] for runner DB just save: id, name and sport (not all metadata of the odds)
+- [x] for runner DB just save: id, name and sport (not all metadata of the odds)
 - [ ] in runner DB when add runner please set the sport to, (ex. {"id": 28602170, "name": "Hyde Park Barracks", "sport":"HORSE"}, {"id": 39258079, "name": "Inter Milan", "sport":"SOCCER"}, {"id": 56598184, "name": "Novak Djokovic", "sport":"TENNIS"})
 - [ ] for runner DB files please save with time too (date and time), cause if run the script 2 times a day it will be replaced
 ### FIX
