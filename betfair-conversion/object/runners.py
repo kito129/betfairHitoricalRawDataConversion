@@ -2,7 +2,7 @@ from os import PathLike
 
 import simplejson as json
 
-from markets import MarketInfo
+from .markets import MarketInfo
 
 
 # ##

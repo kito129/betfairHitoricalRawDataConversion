@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 import json
 from multiprocessing import cpu_count, Pool
 from pathlib import Path
@@ -60,6 +60,7 @@ def process_all_json(json_paths: list[Path]):
                 if market:
                     runners_db.save_market(market)
 
-    runners_path = Path(f"exportOutput/runner/runnerDB_{date.today().strftime('%Y-%m-%d')}.json")
+    now = datetime.now()
+    runners_path = Path(f"exportOutput/runner/runnerDB_{now.strftime('%Y-%m-%d_%H-%M-%S')}.json")
     runners_path.parent.mkdir(parents=True, exist_ok=True)
     runners_db.save(runners_path)
