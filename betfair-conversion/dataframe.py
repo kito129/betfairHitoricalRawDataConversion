@@ -194,7 +194,7 @@ def print_dataframe(dataframe):
 
 
 # get data frame and convert to main object
-def convert_to_obj(dataframe, status):
+def convert_to_obj(dataframe, status: str, sport: str):
     # print("Start in converting dataframe to object..")
 
     # convert to dict
@@ -203,7 +203,7 @@ def convert_to_obj(dataframe, status):
     marketPrices = dataframe['odds'].to_dict(orient="split")
 
     # main market info --> 1/3 part of object
-    mainMarket = MarketInfo(marketInfo, status)
+    mainMarket = MarketInfo(marketInfo, status, sport)
 
     # main market update --> part of object market
     mainMarketUpdate = MarketUpdate(marketInfo)
@@ -213,9 +213,6 @@ def convert_to_obj(dataframe, status):
     # runners --> 2/3 part of object
     mainRunners = Runners(marketSelections)
     mainMarket.setRunners(mainRunners)
-
-    # TODO update market sports, TO FIX here we don't need this function cause sport no is determined by folder name where the file is placed
-    mainMarket.setSport(mainRunners)
 
     # odds --> 3/3 part of object
     mainOdds = Odds(marketPrices, mainRunners, status)

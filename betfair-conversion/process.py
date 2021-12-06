@@ -22,13 +22,14 @@ def remove_market_duplicates(market: pd.DataFrame) -> pd.DataFrame:
 
 def process_json(path: Path) -> Optional[MarketInfo]:
     status = "BASIC" if "BASIC" in path.parts else "ADVANCED"
+    sport = path.parts[path.parts.index(status) + 1]
     market_json_path = "exportOutput/markets" / Path(*path.parts[path.parts.index(status):])
     if market_json_path.exists():
         return None
 
     frame = create_main_dataframe(path, status)
     frame["market"] = remove_market_duplicates(frame["market"])
-    obj = convert_to_obj(frame, status)
+    obj = convert_to_obj(frame, status, sport)
     info = obj.info
     if obj.status == "REMOVED":
         return None

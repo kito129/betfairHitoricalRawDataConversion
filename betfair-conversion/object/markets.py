@@ -11,32 +11,30 @@ class MarketInfo:
 
         # default constructor
 
-    def __init__(self, obj, status):
+    def __init__(self, obj, status: str, sport: str):
         self.status = status
         # get the last market update with correct openDate
         lastMarketUpdate = obj['data'][-1]
 
         #convert open date to unix time in ms
-        # TODO to fix this should be timestamp in ms too
-        openDate = int(datetime.fromisoformat(lastMarketUpdate[4][:-1]).timestamp()) *1000000000
-
+        openDate = int(datetime.fromisoformat(lastMarketUpdate[4][:-1]).timestamp()) * 1000
 
         # volume for ADVANCED
         if status == 'ADVANCED':
             self.info = {
                 "id": lastMarketUpdate[1],
                 "eventId": lastMarketUpdate[2],
-                "eventName": lastMarketUpdate[7],
+                "eventName": lastMarketUpdate[6],
                 "marketType": lastMarketUpdate[3],
                 "openDate": openDate,
-                "name": lastMarketUpdate[6],
-                "numberOfActiveRunner": lastMarketUpdate[8],
+                "name": lastMarketUpdate[7],
+                "numberOfActiveRunners": lastMarketUpdate[8],
                 # is not always present but where there i need to copy here
-                "countryCode": '',
+                "countryCode": lastMarketUpdate[obj["columns"].index("countryCode")] if "countryCode" in obj["columns"] else "",
                 # this will be complited with info based on where the file is placed
-                "sport": "",
+                "sport": sport,
                 # is not always present but where there i need to copy here
-                "venue": "",
+                "venue": lastMarketUpdate[obj["columns"].index("venue")] if "venue" in obj["columns"] else "",
                 # will comleted in second time, only for advanded data
                 "volume": {
                     "total": 0,
@@ -49,15 +47,15 @@ class MarketInfo:
             self.info = {
                 "id": lastMarketUpdate[1],
                 "eventId": lastMarketUpdate[2],
-                "eventName": lastMarketUpdate[7],
+                "eventName": lastMarketUpdate[6],
                 "marketType": lastMarketUpdate[3],
                 "openDate": openDate,
-                "name": lastMarketUpdate[6],
-                "numberOfActiveRunner": lastMarketUpdate[8],
+                "name": lastMarketUpdate[7],
+                "numberOfActiveRunners": lastMarketUpdate[8],
                 # same comment ad advanced
-                "countryCode": '',
-                "sport": "",
-                "venue": ""
+                "countryCode": lastMarketUpdate[obj["columns"].index("countryCode")] if "countryCode" in obj["columns"] else "",
+                "sport": sport,
+                "venue": lastMarketUpdate[obj["columns"].index("venue")] if "venue" in obj["columns"] else "",
                 # here there aren't info about volume
             }
 
@@ -92,26 +90,7 @@ class MarketInfo:
             self.runners.append(run)
             count += 1
 
-        self.info['numberOfActiveRunner'] = count
-
-    # calculate sport based on runners number and if is present the draw
-    def setSport(self, runners):
-        # TODO remove and set sport based on folder path name
-        if (runners.runnerCount == 2):
-            # 2 market
-            # check if tennis
-            if self._check_tennis(runners):
-                self.info['sport'] = "TENNIS"
-                pass
-        elif runners.runnerCount == 3:
-            # possible football, check is the draw
-            # check if footbla
-            if self._check_football(runners):
-                self.info['sport'] = "FOOTBALL"
-                pass
-        else:
-            self.info['sport'] = "HORSE RACING"
-            pass
+        self.info['numberOfActiveRunners'] = count
 
     # return true for tennis spec of runners
     def _check_tennis(self, runners):

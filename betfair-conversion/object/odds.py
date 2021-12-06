@@ -3,7 +3,7 @@ import pandas as pd
 
 
 # definition of class Market
-class Odds():
+class Odds:
 
     # default constructor
     def __init__(self, obj, runners, status):
