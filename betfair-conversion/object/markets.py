@@ -14,7 +14,7 @@ class MarketInfo:
     def __init__(self, obj, status):
         self.status = status
         # get the last market update with correct openDate
-        lastMarketUpdate = obj['data'][len(obj['data']) - 1]
+        lastMarketUpdate = obj['data'][-1]
 
         #convert open date to unix time in ms
         # TODO to fix this should be timestamp in ms too
@@ -124,7 +124,7 @@ class MarketInfo:
     # return true for football spec of runners
     def _check_football(self, runners):
         for run in runners.runners:
-            if ("The Draw" in str(run[2])):
+            if "The Draw" in str(run[2]):
                 return True
             pass
         return False
