@@ -51,6 +51,35 @@ class PathConfig:
 
 
 - [x] I want to add OTHER sport, so if a market is under /ADVANCED/OTHER or /BASIC/OTHER  just set the sport to OTHER and not add any additional info form excel
+
+- [x] change the props name to this ones
+```json
+{
+  "marketType": "ADVANCED",
+  "marketInfo": {},
+  "marketRunners": [],
+  "marketUpdates": [],
+  "marketOdds": [
+    {
+      "runnerId": 305969,
+      "odd": []
+    }
+  ]
+}
+       
+```
+
+- [ ] It doesn't process all market for soccer, run only over correct score matchOdds and halfTime, missing all Under Over
+
+
+Input
+![img.png](img.png)
+
+Output missing market form 202 to 206
+![img_1.png](img_1.png)
+
+
+
 ### CONSISTENCY
 - [x] uniform time, when you have to do with data or time please convert always in UTC millisecond timestamp (marketInfo.openDate, in marketUpdate.timeStamp and marketUpdate.openDate, and in odds timestamp too  )
 - [x] uniform soccer and football name, use always SOCCER terms
@@ -60,9 +89,24 @@ class PathConfig:
 - [x] for runner DB just save: id, name and sport (not all metadata of the odds)
 - [x] in runner DB when add runner please set the sport to, (ex. {"id": 28602170, "name": "Hyde Park Barracks", "sport":"HORSE"}, {"id": 39258079, "name": "Inter Milan", "sport":"SOCCER"}, {"id": 56598184, "name": "Novak Djokovic", "sport":"TENNIS"})
 - [x] for runner DB files please save with time too (date and time), cause if run the script 2 times a day it will be replaced
+- [ ] when save HORSE runners in runnersDB remove the position number if present (ex.     
+```json
+{
+  "id": 27693532,
+  "name": "2. Pelonomena",
+  "sport": "HORSE RACING"
+}, become-->>     
+{
+  "id": 27693532,
+  "name": "Pelonomena",
+  "sport": "HORSE RACING"
+}, 
+```
 ### FIX
 - [x] when check last market update to save the market info, if STATUS == "REMOVED" just skip the market
 - [x] in marketUpdate remove "complete" proprieties, I don't need that
+    ![img_2.png](img_2.png)
+- still present with non logic values
 - [x] change all NaN to null (NaN is not a valid JSON)
 - [x] it doesn't remove some TENNIS market with marketName contains "/" inside (ex. "Bara/Gorgodze v Piter/Sherif" is still present in output)
 - [x] the code already use by code to divide the sport (checkTennis and other functions) remove that and set sport based on where the market is placed in path (the code set HORSE for correct score market because have 16 runners, but is SOCCER )
