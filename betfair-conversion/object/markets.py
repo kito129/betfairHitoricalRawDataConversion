@@ -123,24 +123,21 @@ class MarketInfo:
         inPlayTime = 0
         # find open time for market Update
         for elem in self.marketUpdates:
-            if elem['inPlay'] and elem['status'] == 'OPEN' and elem['betDelay'] >0 :
+            if elem['inPlay'] and elem['status'] == 'OPEN' and elem['betDelay'] > 0 :
                 inPlayTime = int(elem['timestamp'])
                 break
 
-        # TODO to fix this should be timestamp in ms too
         self.info['openDate'] = int(inPlayTime / 1000000)
         self.info['delay'] = self.marketUpdates[len(self.marketUpdates)-1]['betDelay']
 
     # update odds for status in updates
     def updateRunnersStats(self):
-        # TODO is possible to improve that function?
         inPlay = self.info['openDate']
         runners = self.runners
         odds = self.odds
 
         # find inplay for all runners
         for run in runners:
-
             sumPrematch = 0
             stepCounter = 0
             contPrematch = 0
@@ -163,7 +160,6 @@ class MarketInfo:
                             # avg runner prematch odd
                             if stepCounter < inPlayindex:
                                 # check if max prematch
-                                # TODO check if prematch have at least one value, instead set max and min  = null
                                 if _odd['ltp'] > maxPrematch:
                                     maxPrematch = _odd['ltp']
                                 # check if min prematch
@@ -178,7 +174,6 @@ class MarketInfo:
                                 # set the first inplay ltp as inPlayOdds
                                 if not found:
                                     # volume for ADVANCED only (check volume)
-                                    # TODO check if prematch have at least one value, instead set preMatchVolume =0
                                     if self.status == 'ADVANCED':
                                         preMatchVolume = _odd['tv']
                                     # inPlay time and odds
@@ -214,15 +209,15 @@ class MarketInfo:
                         # volume for ADVANCED
                         if self.status == 'ADVANCED':
                             run['tradedVolume'] = round(odd['odds'][len(odd['odds']) - 1]['tv'],2)
-                            run['preMatchVolume'] = round(preMatchVolume,2)
+                            run['preMatchVolume'] = round(preMatchVolume, 2)
                             run['inPlayVolume'] = round(run['tradedVolume'] - preMatchVolume,2)
                     # no odds for this runner
                     else:
                         run['inPlayOdds'] = 0
                         run['openOdds'] = 0
                         run['closedOdds'] = 0
-                        run['maxPrematch'] = 0
-                        run['minPrematch'] = 0
+                        run['maxPrematch'] = None
+                        run['minPrematch'] = None
                         run['maxInPlay'] = 0
                         run['minInPlay'] = 0
                         # volume for ADVANCED
@@ -233,7 +228,6 @@ class MarketInfo:
 
     # update total market volume based on runner traded volume
     def updateVolume(self):
-
         for runnerVol in self.runners:
             self.info['volume']['total'] = round(self.info['volume']['total'] +  runnerVol['tradedVolume'],2)
             self.info['volume']['preMatch'] = round(self.info['volume']['preMatch'] +  runnerVol['preMatchVolume'],2)
@@ -241,15 +235,10 @@ class MarketInfo:
 
     # find inPlay index for this runner
     def _find_inPlay_index(self, runnerOdds, inPlayTime):
-        # TODO is possible to improve that function?
-        counter = 0
-        minCounter = -1
-        for value in runnerOdds['odds']:
+        for (i, value) in enumerate(runnerOdds['odds']):
             if value['timestamp'] - inPlayTime >= 0:
-                minCounter = counter
-                break
-            counter = counter + 1
-        return minCounter
+                return i
+        return -1
 
     # print main market
     def printMarketJSON(self):
@@ -275,10 +264,9 @@ class MarketUpdate:
         updates = obj['data']
 
         for up in updates:
-            timeStamp = int(up[0].value)
+            timeStamp = int(up[0].value / 1000000)
             self.marketUpdate.append({
                 "timestamp": timeStamp,
-                # TODO to fix this should be timestamp in ms too
                 "openDate": up[4],
                 "status": up[5],
                 "betDelay": up[8],

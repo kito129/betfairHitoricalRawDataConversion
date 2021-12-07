@@ -104,13 +104,10 @@ def get_market_dataframe(path):
         _markets = _get_markets(path)
         markets = _markets['markets']
         markets_df = (pd.DataFrame.from_records(markets)
-            .assign(publish_time=lambda df: pd.to_datetime(df['clk'], unit='ms'))
+            .assign(publish_time=lambda df: pd.to_datetime(df['clk'], unit='ms')))
+        markets_df = (markets_df.reindex(columns=markets_df.columns.union(["countryCode", "venue"]))
         [['publish_time', 'id', 'eventId', 'marketType', 'openDate', 'status', 'eventName', 'name', 'betDelay',
-          'inPlay', 'numberOfActiveRunners', 'version']])
-        # missing venue and country code cause in some file it could not be present,
-        # so we have to check before if present and than save this value
-
-        # print("Correctly get market info dataframe..")
+          'inPlay', 'numberOfActiveRunners', 'version', "countryCode", "venue"]])
     except KeyError as e:
         logger.error('A MARKET INFO error occurred')
         raise e
@@ -159,8 +156,6 @@ def get_prices_dataframe(path, status):
     elif status == "ADVANCED":
         columns = ['publish_time', 'runner_id', 'runner_name', 'odds', 'tv', 'trd', 'batb', 'batl', 'sortPriority']
     prices_df_long = prices_df_long.reindex(columns=prices_df_long.columns.union(columns))
-
-    # TODO fix raised exception never caught
 
     try:
         prices_df_long = prices_df_long[columns]

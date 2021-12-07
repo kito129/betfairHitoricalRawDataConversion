@@ -2,6 +2,7 @@ from bz2 import BZ2File
 from multiprocessing import cpu_count, Pool
 import os
 from pathlib import Path
+import time
 
 from loguru import logger
 
@@ -24,13 +25,14 @@ def do_extract_json(params: tuple) -> list[Path]:
 
 def extract_all_json(data_path: Path, extract_path: Path) -> list[Path]:
     logger.info("Extracting files...")
+    extract_start = time.perf_counter()
 
-    data_path.mkdir(exist_ok=True)
+    data_path.mkdir(parents=True, exist_ok=True)
 
     bz2_files = [
         (
-            data_path / path / file,
-            extract_path / Path(path, file).relative_to(data_path).with_suffix(".json"),
+            Path(path, file),
+            (extract_path / Path(path, file).relative_to(data_path)).with_suffix(".json"),
         )
         for (path, _, files) in os.walk(data_path)
         for file in files
@@ -52,7 +54,7 @@ def extract_all_json(data_path: Path, extract_path: Path) -> list[Path]:
                     json_paths.append(json_path)
                     progress.advance(task)
 
+    logger.info(f"Extraction completed in {time.perf_counter() - extract_start:.2f}s!")
     logger.info(f"Files extracted: {len(to_extract)}")
-    logger.info("Extraction completed!")
 
     return json_paths
