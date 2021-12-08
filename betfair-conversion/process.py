@@ -43,8 +43,8 @@ def process_json(export_dir: Path, sport_info: tuple, path: Path) -> Optional[Ma
     open_date = datetime.fromtimestamp(info["openDate"] / 1000)
     # TODO: WE HAVE TO REMOVE ALL THE MARKET NEVER TURNED IN PLAY (FOR FOOTBALL AND TENNIS)
     if ((info["sport"] == "TENNIS" and (
-            (open_date.year > 2019 and info["delay"] > 3)
-            or (open_date.year < 2019 and info["delay"] > 5))
+            (open_date.year > 2018 and info["delay"] > 5)
+            or (open_date.year < 2018 and info["delay"] > 7))
     ) or (info["sport"] == "SOCCER" and info["delay"] > 7)
             or (info["sport"] == "TENNIS" and "/" in info["eventName"])):
         return None
