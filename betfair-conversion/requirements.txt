@@ -1,4 +1,7 @@
+dateparser
 loguru
+lxml
+openpyxl
 pandas
 rich
 simplejson

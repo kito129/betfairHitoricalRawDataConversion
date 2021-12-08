@@ -17,11 +17,19 @@ class Runners:
 
     # default constructor
     def __init__(self, obj):
-
         self.runners = []
         count = 0
         for runner in obj['data']:
-            count = count + 1
+            count += 1
+
+            # Remove position from horse name
+            split = runner[2].partition(". ")
+            try:
+                int(split[0])
+                runner[2] = split[-1]
+            except ValueError:
+                pass
+
             self.runners.append(runner)
             if runner[0] == "WINNER":
                 self.winner = runner

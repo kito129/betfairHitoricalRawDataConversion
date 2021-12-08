@@ -2,6 +2,10 @@ from datetime import datetime
 import pprint
 
 
+def parse_date(date: str) -> int:
+    return int(datetime.fromisoformat(date[:-1]).timestamp()) * 1000
+
+
 # definition of class Market
 class MarketInfo:
 
@@ -17,7 +21,7 @@ class MarketInfo:
         lastMarketUpdate = obj['data'][-1]
 
         #convert open date to unix time in ms
-        openDate = int(datetime.fromisoformat(lastMarketUpdate[4][:-1]).timestamp()) * 1000
+        openDate = parse_date(lastMarketUpdate[4])
 
         # volume for ADVANCED
         if status == 'ADVANCED':
@@ -31,7 +35,6 @@ class MarketInfo:
                 "numberOfActiveRunners": lastMarketUpdate[8],
                 # is not always present but where there i need to copy here
                 "countryCode": lastMarketUpdate[obj["columns"].index("countryCode")] if "countryCode" in obj["columns"] else "",
-                # this will be complited with info based on where the file is placed
                 "sport": sport,
                 # is not always present but where there i need to copy here
                 "venue": lastMarketUpdate[obj["columns"].index("venue")] if "venue" in obj["columns"] else "",
@@ -127,8 +130,8 @@ class MarketInfo:
                 inPlayTime = int(elem['timestamp'])
                 break
 
-        self.info['openDate'] = int(inPlayTime / 1000000)
-        self.info['delay'] = self.marketUpdates[len(self.marketUpdates)-1]['betDelay']
+        self.info['openDate'] = int(inPlayTime)
+        self.info['delay'] = self.marketUpdates[-1]['betDelay']
 
     # update odds for status in updates
     def updateRunnersStats(self):
@@ -196,8 +199,8 @@ class MarketInfo:
                         # closed odds
                         run['closedOdds'] = odd['odds'][len(odd['odds']) - 1]['ltp']
                         # max and min prematch
-                        run['maxPrematch'] = maxPrematch
-                        run['minPrematch'] = minPrematch
+                        run['maxPrematch'] = maxPrematch if contPrematch else None
+                        run['minPrematch'] = minPrematch if contPrematch else None
                         # max and min inPlay
                         run['maxInPlay'] = maxInPlay
                         run['minInPlay'] = minInPlay
@@ -208,9 +211,12 @@ class MarketInfo:
                         run['lengthOddsInPlay'] = stepCounter - contPrematch
                         # volume for ADVANCED
                         if self.status == 'ADVANCED':
-                            run['tradedVolume'] = round(odd['odds'][len(odd['odds']) - 1]['tv'],2)
+                            run['tradedVolume'] = round(odd['odds'][len(odd['odds']) - 1]['tv'], 2)
                             run['preMatchVolume'] = round(preMatchVolume, 2)
-                            run['inPlayVolume'] = round(run['tradedVolume'] - preMatchVolume,2)
+                            run['inPlayVolume'] = round(run['tradedVolume'] - preMatchVolume, 2)
+                            if contPrematch == 0:
+                                run["inPlayVolume"] += run["preMatchVolume"]
+                                run["preMatchVolume"] = 0
                     # no odds for this runner
                     else:
                         run['inPlayOdds'] = 0
@@ -267,11 +273,10 @@ class MarketUpdate:
             timeStamp = int(up[0].value / 1000000)
             self.marketUpdate.append({
                 "timestamp": timeStamp,
-                "openDate": up[4],
+                "openDate": parse_date(up[4]),
                 "status": up[5],
                 "betDelay": up[8],
                 "inPlay": up[9],
-                "complete": up[10],
             })
 
 
