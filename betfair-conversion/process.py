@@ -48,12 +48,15 @@ def process_json(export_dir: Path, sport_info: tuple, path: Path):
     if obj.status == "REMOVED":
         return basic_info
     open_date = datetime.fromtimestamp(info["openDate"] / 1000)
-    # TODO: WE HAVE TO REMOVE ALL THE MARKET NEVER TURNED IN PLAY (FOR FOOTBALL AND TENNIS)
+    in_play_length = 0
+    for runner in obj.runners:
+        in_play_length += runner.get("lengthOddsInPlay", 0)
     if ((sport == "TENNIS" and (
             (open_date.year > 2018 and info["delay"] > 5)
             or (open_date.year < 2018 and info["delay"] > 7))
     ) or (sport == "SOCCER" and info["delay"] > 7)
-            or (sport == "TENNIS" and "/" in info["eventName"])):
+            or (sport == "TENNIS" and "/" in info["eventName"])
+            or (sport in ["SOCCER", "TENNIS"] and in_play_length == 0)):
         return basic_info
 
     renamed_obj = {
