@@ -12,12 +12,13 @@ SOCCER
 
 have only this info 
 
-
+  ```json
  "additionalInfo": {
         "league": "Premier League",
         "countryCode": "GBR",
         "season": "2021/2022"
     }
+```
  
 but as i said i need all columns data
 once fond the row in excel we need to copy these columns in the JSON
@@ -90,12 +91,15 @@ TENNIS
 /ADVANCED/TENNIS/2021/SEPT/20/30918523/1.187815108
 
 for the moment have this info 
+
+  ```json
     "additionalInfo": {
         "federation": "ATP",
         "sex": "MALE",
         "season": 2021
     }
-
+  ```
+  
 but I need all the columns specified
 
   ```json
