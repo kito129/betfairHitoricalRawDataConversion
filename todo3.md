@@ -103,7 +103,7 @@ for the moment have this info
 but I need all the columns specified
 
   ```json
-"tennis":{         
+"additionalInfo":{         
             "federation": "ATP",
             "sex": "MALE",
             "season": 2021,
