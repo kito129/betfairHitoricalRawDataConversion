@@ -2,6 +2,7 @@ dateparser
 loguru
 lxml
 openpyxl
+openpyxl-dictreader
 pandas
 rich
 simplejson

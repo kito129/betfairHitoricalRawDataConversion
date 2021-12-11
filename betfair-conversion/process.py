@@ -90,7 +90,7 @@ def process_json(export_dir: Path, sport_info: tuple, path: Path):
             renamed_obj["additionalInfo"] = {
                 "league": league,
                 "countryCode": code,
-                "season": f"{open_date.year}/{open_date.year + 1}" if open_date.month > 5 else f"{open_date.year - 1}/{open_date.year}",
+                "season":
             }
 
     if "additionalInfo" not in renamed_obj:
@@ -101,15 +101,6 @@ def process_json(export_dir: Path, sport_info: tuple, path: Path):
         json.dump(renamed_obj, market_json_file, indent=4, ignore_nan=True)
 
     return path, sport, status, obj
-
-
-def strip_name(name: str) -> str:
-    # Get name before first first name shortening
-    name = name.partition(".")[0]
-    # Split words
-    split = name.split()
-    # Return "last word of last name-first letter of first name", e.g. Thompson-J
-    return "-".join(split[-2:])
 
 
 def process_all_json(json_paths: list[Path]):
@@ -123,49 +114,7 @@ def process_all_json(json_paths: list[Path]):
     json_input = DataFrame(index=["HORSE", "SOCCER", "TENNIS", "OTHER"], columns=["BASIC", "ADVANCED"], dtype="Int64").fillna(0)
     json_output = DataFrame(index=["HORSE", "SOCCER", "TENNIS", "OTHER"], columns=["BASIC", "ADVANCED"], dtype="Int64").fillna(0)
 
-    soccer_leagues = {
-        "E0": ("Premier League", "GBR"),
-        "E1": ("Championship", "GBR"),
-        "SC0": ("Premier League", "SCOT"),
-        "SC1": ("Division 1", "SCOT"),
-        "D1": ("Budesliga 1", "GER"),
-        "D2": ("Budesliga 2", "GER"),
-        "I1": ("Serie A", "ITA"),
-        "I2": ("Serie B", "ITA"),
-        "SP1": ("La Liga Primera Division", "ESP"),
-        "SP2": ("La Liga Segunda Division", "ESP"),
-        "F1": ("Ligue 1", "FRA"),
-        "F2": ("Ligue 2", "FRA"),
-        "N1": ("Eredivise", "NLD"),
-        "B1": ("Jupiler League", "BEL"),
-        "P1": ("Liga I", "PRT"),
-        "T1": ("Futbol Ligi 1", "TUR"),
-        "G1": ("Ethniki Katigoria", "GRE"),
-    }
-    soccer_matches = {}
-    excel = Path("excel")
-    for soccer_path in excel.glob("SOCCER/*.csv"):
-        with open(soccer_path) as soccer_file:
-            soccer_csv = DictReader(soccer_file)
-            for row in soccer_csv:
-                date = dateparser.parse(row["Date"], date_formats=["%d/%m/%y", "%d/%m/%Y"]).strftime("%Y-%m-%d")
-                match = f"{date}-{row['HomeTeam']}-{row['AwayTeam']}"
-                soccer_matches[match] = soccer_leagues[row["Div"]]
 
-    tennis_federations = {
-        "ATP": "MALE",
-        "WTA": "FEMALE",
-    }
-    tennis_matches = {}
-    for tennis_path in excel.glob("TENNIS/*/*.xlsx"):
-        try:
-            ws = openpyxl.open(tennis_path, read_only=True).active
-        except IOError:
-            continue
-        for row in ws.iter_rows(min_row=2, min_col=4, max_col=11, values_only=True):
-            match = f"{row[0].strftime('%Y-%m-%d')}-{strip_name(row[-2])}-{strip_name(row[-1])}"
-            federation = tennis_path.parts[-2]
-            tennis_matches[match] = (federation, tennis_federations[federation])
 
     with get_progress() as progress:
         task = progress.add_task("JSON Files", total=len(json_paths))
