@@ -102,10 +102,6 @@ def process_all_json(json_paths: list[Path]):
     json_input = DataFrame(index=["HORSE", "SOCCER", "TENNIS", "OTHER"], columns=["BASIC", "ADVANCED"], dtype="Int64").fillna(0)
     json_output = DataFrame(index=["HORSE", "SOCCER", "TENNIS", "OTHER"], columns=["BASIC", "ADVANCED"], dtype="Int64").fillna(0)
 
-    soccer_matches = get_soccer_matches()
-    tennis_matches = get_tennis_matches()
-    manager = Manager()
-
     with get_progress() as progress:
         task = progress.add_task("JSON Files", total=len(json_paths))
         with Pool(processes=cpu_count()) as pool, Manager() as manager:
@@ -120,6 +116,11 @@ def process_all_json(json_paths: list[Path]):
                 if market:
                     runners_db.save_market(market)
                     json_output.at[sport, status] += 1
+
+            # Extra statement is needed to prevent hanging context manager.
+            # Q: Why?
+            # A: ???
+            _ = 1
 
     runners_db.save(export_output / "runnerDB.json")
 
