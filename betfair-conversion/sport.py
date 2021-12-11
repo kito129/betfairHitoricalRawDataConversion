@@ -48,9 +48,7 @@ SOCCER_LEAGUES = {
 }
 
 
-def get_soccer_matches() -> dict:
-    soccer_matches = {}
-
+def get_soccer_matches(soccer_matches: dict = {}) -> dict:
     for soccer_path in EXCEL.glob("SOCCER/*.csv"):
         with open(soccer_path) as soccer_file:
             soccer_csv = csv.DictReader(soccer_file)
@@ -132,9 +130,7 @@ def strip_name(name: str) -> str:
     return "-".join(split[-2:])
 
 
-def get_tennis_matches() -> dict:
-    tennis_matches = {}
-
+def get_tennis_matches(tennis_matches: dict = {}) -> dict:
     for tennis_path in EXCEL.glob("TENNIS/*/*.xlsx"):
         # Thanks to bmiller on StackOverflow: https://stackoverflow.com/a/43789779
         try:
@@ -143,7 +139,7 @@ def get_tennis_matches() -> dict:
         except IOError:
             continue
 
-        for row in openpyxl_dictreader.DictReader(in_mem_file, read_only=True)
+        for row in openpyxl_dictreader.DictReader(in_mem_file, read_only=True):
             date = row["Date"]
             winner = strip_name(row["Winner"])
             loser = strip_name(row["Loser"])

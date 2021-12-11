@@ -1,15 +1,11 @@
-from csv import DictReader
 from datetime import datetime
 import functools
 import json
-from multiprocessing import cpu_count, Pool
+from multiprocessing import cpu_count, Manager, Pool
 from pathlib import Path
 import time
-from typing import Optional
 
-import dateparser
 from loguru import logger
-import openpyxl
 from pandas import DataFrame
 import simplejson as json
 
@@ -17,6 +13,7 @@ from dataframe import create_main_dataframe, convert_to_obj
 from paths import PathConfig
 from object.markets import MarketInfo
 from object.runners import RunnersDB
+from sport import get_soccer_matches, get_tennis_matches
 from utils import get_progress
 
 
@@ -31,8 +28,8 @@ def canonize_name(name: str) -> str:
     return f"{split[-1]}-{name[0]}"
 
 
-def process_json(export_dir: Path, sport_info: tuple, path: Path):
-    tennis_matches, soccer_matches = sport_info
+def process_json(export_dir: Path, sport_info: tuple, path: Path) -> (Path, str, str, MarketInfo):
+    soccer_matches, tennis_matches = sport_info
 
     status = "BASIC" if "BASIC" in path.parts else "ADVANCED"
     sport = path.parts[path.parts.index(status) + 1]
@@ -68,30 +65,21 @@ def process_json(export_dir: Path, sport_info: tuple, path: Path):
     }
 
     date = open_date.strftime("%Y-%m-%d")
-    if sport == "TENNIS":
+    # Only add additional info for soccer markets with type MATCH_ODDS
+    if sport == "SOCCER" and obj.info["marketType"] == "MATCH_ODDS":
+        split = info["eventName"].split(" v ")
+        match = f"{date}-{split[0]}-{split[1]}"
+        if match in soccer_matches:
+            renamed_obj["additionalInfo"] = soccer_matches[match]
+    elif sport == "TENNIS":
         try:
             winner = canonize_name(next(r for r in obj.runners if r["status"] == "WINNER")["name"])
             loser = canonize_name(next(r for r in obj.runners if r["status"] == "LOSER")["name"])
             match = f"{date}-{winner}-{loser}"
             if match in tennis_matches:
-                federation, gender = tennis_matches[match]
-                renamed_obj["additionalInfo"] = {
-                    "federation": federation,
-                    "sex": gender,
-                    "season": open_date.year,
-                }
+                renamed_obj["additionalInfo"] = tennis_matches[match]
         except StopIteration:
             pass
-    elif sport == "SOCCER":
-        split = info["eventName"].split(" v ")
-        match = f"{date}-{split[0]}-{split[1]}"
-        if match in soccer_matches:
-            league, code = soccer_matches[match]
-            renamed_obj["additionalInfo"] = {
-                "league": league,
-                "countryCode": code,
-                "season":
-            }
 
     if "additionalInfo" not in renamed_obj:
         renamed_obj["additionalInfo"] = {}
@@ -114,12 +102,17 @@ def process_all_json(json_paths: list[Path]):
     json_input = DataFrame(index=["HORSE", "SOCCER", "TENNIS", "OTHER"], columns=["BASIC", "ADVANCED"], dtype="Int64").fillna(0)
     json_output = DataFrame(index=["HORSE", "SOCCER", "TENNIS", "OTHER"], columns=["BASIC", "ADVANCED"], dtype="Int64").fillna(0)
 
-
+    soccer_matches = get_soccer_matches()
+    tennis_matches = get_tennis_matches()
+    manager = Manager()
 
     with get_progress() as progress:
         task = progress.add_task("JSON Files", total=len(json_paths))
-        with Pool(processes=cpu_count()) as pool:
-            for result in pool.imap(functools.partial(process_json, export_output, (tennis_matches, soccer_matches)), json_paths):
+        with Pool(processes=cpu_count()) as pool, Manager() as manager:
+            soccer_matches = get_soccer_matches(manager.dict())
+            tennis_matches = get_tennis_matches(manager.dict())
+
+            for result in pool.imap(functools.partial(process_json, export_output, (soccer_matches, tennis_matches)), json_paths):
                 progress.advance(task)
                 path, sport, status, market = result
                 json_input.at[sport, status] += 1
