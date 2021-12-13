@@ -44,7 +44,7 @@ class RunnersDB:
         self.runners = {}
 
     # iterate over runner of this match and check if it's present
-    def save_market(self, market: MarketInfo):
+    def saveMarket(self, market: MarketInfo):
         for runner in market.runners:
             runner_id = runner["id"]
             if not self.contains(runner_id):

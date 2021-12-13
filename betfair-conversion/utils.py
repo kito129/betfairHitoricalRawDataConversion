@@ -1,7 +1,7 @@
 from rich.progress import BarColumn, Progress, TimeRemainingColumn
 
 
-def get_progress() -> Progress:
+def getProgress() -> Progress:
     return Progress(
         "[progress.description]{task.description}",
         BarColumn(),

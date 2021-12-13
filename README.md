@@ -632,125 +632,123 @@ if status == 'ADVANCED':
 * runners['preMatchVolume']: the total traded volume on this runner before the open date
 * runners['inPlayVolume']: the total traded volume on this runner from the open date to the end CLOSE of the market
 
-
 ```python
  # update odds for status in updates
-    def updateRunnersStats(self, status):
+def updateRunnersStats(self, status):
+    inPlay = self.info['openDate']
+    runners = self.runners
+    odds = self.odds
 
-        inPlay = self.info['openDate']
-        runners = self.runners
-        odds = self.odds
+    # find inplay for all runners
+    for run in runners:
 
-        # find inplay for all runners
-        for run in runners:
+        sumPrematch = 0
+        stepCounter = 0
+        contPrematch = 0
+        maxPrematch = -100
+        minPrematch = 1001
+        maxInPlay = -100
+        minInPlay = 1001
+        found = False
 
-            sumPrematch = 0
-            stepCounter = 0
-            contPrematch = 0
-            maxPrematch = -100
-            minPrematch = 1001
-            maxInPlay = -100
-            minInPlay = 1001
-            found = False
+        # volume for runner
+        preMatchVolume = 0
 
-            # volume for runner
-            preMatchVolume = 0
+        # iterate over odds
+        for odd in odds:
+            if odd['runnerId'] == run['id']:
+                # find inPlay index
+                inPlayindex = int(self.findInPlayIndex(odd, inPlay))
+                if len(odd['odds']) > 0 and inPlayindex > -1:
+                    for _odd in odd['odds']:
+                        # avg runner prematch odd
+                        if stepCounter < inPlayindex:
+                            # check if max prematch
+                            if _odd['ltp'] > maxPrematch:
+                                maxPrematch = _odd['ltp']
+                            # check if min prematch
+                            if _odd['ltp'] < minPrematch:
+                                minPrematch = _odd['ltp']
+                            # increment prematch counter
+                            sumPrematch = sumPrematch + _odd['ltp']
+                            contPrematch = contPrematch + 1
 
-            # iterate over odds
-            for odd in odds:
-                if odd['runnerId'] == run['id']:
-                    # find inPlay index
-                    inPlayindex = int(self._find_inPlay_index(odd, inPlay))
-                    if len(odd['odds']) > 0 and inPlayindex > -1:
-                        for _odd in odd['odds']:
-                            # avg runner prematch odd
-                            if stepCounter < inPlayindex:
-                                # check if max prematch
-                                if _odd['ltp'] > maxPrematch:
-                                    maxPrematch = _odd['ltp']
-                                # check if min prematch
-                                if _odd['ltp'] < minPrematch:
-                                    minPrematch = _odd['ltp']
-                                # increment prematch counter
-                                sumPrematch = sumPrematch + _odd['ltp']
-                                contPrematch = contPrematch + 1
-
-                            elif stepCounter >= inPlayindex:
-                                # im in INPLAY
-                                # set the first inplay ltp as inPlayOdds
-                                if not found:
-                                    # volume for ADVANCED only (check volume)
-                                    if status == 'ADVANCED':
-                                        preMatchVolume = _odd['tv']
-                                    # inPlay time and odds
-                                    run['inPlayOdds'] = _odd['ltp']
-                                    run['inPlayTime'] = _odd['timestamp']
-                                    found = True
-                                # check if max inplay
-                                if _odd['ltp'] > maxInPlay:
-                                    maxInPlay = _odd['ltp']
-                                # check if min inplay
-                                if _odd['ltp'] < minInPlay:
-                                    minInPlay = _odd['ltp']
-                            # increment step counter
-                            stepCounter = stepCounter + 1
-                        # avg odds prematch 
-                        if contPrematch != 0:
-                            run['avgPrematch'] = round(sumPrematch / contPrematch,2)
-                        else:
-                            run['avgPrematch'] = 0
-                        # closed odds
-                        run['closedOdds'] = odd['odds'][len(odd['odds']) - 1]['ltp']
-                        # max and min prematch
-                        run['maxPrematch'] = maxPrematch
-                        run['minPrematch'] = minPrematch
-                        # max and min inPlay
-                        run['maxInPlay'] = maxInPlay
-                        run['minInPlay'] = minInPlay
-                        # odds metadata
-                        run['inPlayIndex'] = inPlayindex
-                        run['lengthOdds'] = stepCounter
-                        run['lengthOddsPrematch'] = contPrematch
-                        run['lengthOddsInPlay'] = stepCounter - contPrematch
-                        # volume for ADVANCED
-                        if status == 'ADVANCED':
-                            run['tradedVolume'] = round(odd['odds'][len(odd['odds']) - 1]['tv'],2)
-                            run['preMatchVolume'] = round(preMatchVolume,2)
-                            run['inPlayVolume'] = round(run['tradedVolume'] - preMatchVolume,2)
-                    # no odds for this runner
+                        elif stepCounter >= inPlayindex:
+                            # im in INPLAY
+                            # set the first inplay ltp as inPlayOdds
+                            if not found:
+                                # volume for ADVANCED only (check volume)
+                                if status == 'ADVANCED':
+                                    preMatchVolume = _odd['tv']
+                                # inPlay time and odds
+                                run['inPlayOdds'] = _odd['ltp']
+                                run['inPlayTime'] = _odd['timestamp']
+                                found = True
+                            # check if max inplay
+                            if _odd['ltp'] > maxInPlay:
+                                maxInPlay = _odd['ltp']
+                            # check if min inplay
+                            if _odd['ltp'] < minInPlay:
+                                minInPlay = _odd['ltp']
+                        # increment step counter
+                        stepCounter = stepCounter + 1
+                    # avg odds prematch 
+                    if contPrematch != 0:
+                        run['avgPrematch'] = round(sumPrematch / contPrematch, 2)
                     else:
-                        run['inPlayOdds'] = 0
-                        run['openOdds'] = 0
-                        run['closedOdds'] = 0
-                        run['maxPrematch'] = 0
-                        run['minPrematch'] = 0
-                        run['maxInPlay'] = 0
-                        run['minInPlay'] = 0
-                        # volume for ADVANCED
-                        if status == 'ADVANCED':
-                            run['tradedVolume'] = 0
-                            run['preMatchVolume'] = 0
-                            run['inPlayVolume'] = 0
+                        run['avgPrematch'] = 0
+                    # closed odds
+                    run['closedOdds'] = odd['odds'][len(odd['odds']) - 1]['ltp']
+                    # max and min prematch
+                    run['maxPrematch'] = maxPrematch
+                    run['minPrematch'] = minPrematch
+                    # max and min inPlay
+                    run['maxInPlay'] = maxInPlay
+                    run['minInPlay'] = minInPlay
+                    # odds metadata
+                    run['inPlayIndex'] = inPlayindex
+                    run['lengthOdds'] = stepCounter
+                    run['lengthOddsPrematch'] = contPrematch
+                    run['lengthOddsInPlay'] = stepCounter - contPrematch
+                    # volume for ADVANCED
+                    if status == 'ADVANCED':
+                        run['tradedVolume'] = round(odd['odds'][len(odd['odds']) - 1]['tv'], 2)
+                        run['preMatchVolume'] = round(preMatchVolume, 2)
+                        run['inPlayVolume'] = round(run['tradedVolume'] - preMatchVolume, 2)
+                # no odds for this runner
+                else:
+                    run['inPlayOdds'] = 0
+                    run['openOdds'] = 0
+                    run['closedOdds'] = 0
+                    run['maxPrematch'] = 0
+                    run['minPrematch'] = 0
+                    run['maxInPlay'] = 0
+                    run['minInPlay'] = 0
+                    # volume for ADVANCED
+                    if status == 'ADVANCED':
+                        run['tradedVolume'] = 0
+                        run['preMatchVolume'] = 0
+                        run['inPlayVolume'] = 0
 
-    # update total market volume based on runner traded volume
-    def updateVolume(self):
 
-        for runnerVol in self.runners:
-            self.info['volume']['total'] = round(self.info['volume']['total'] +  runnerVol['tradedVolume'],2)
-            self.info['volume']['preMatch'] = round(self.info['volume']['preMatch'] +  runnerVol['preMatchVolume'],2)
-            self.info['volume']['inPlay'] = round(self.info['volume']['inPlay'] +  runnerVol['inPlayVolume'],2)
+# update total market volume based on runner traded volume
+def updateVolume(self):
+    for runnerVol in self.runners:
+        self.info['volume']['total'] = round(self.info['volume']['total'] + runnerVol['tradedVolume'], 2)
+        self.info['volume']['preMatch'] = round(self.info['volume']['preMatch'] + runnerVol['preMatchVolume'], 2)
+        self.info['volume']['inPlay'] = round(self.info['volume']['inPlay'] + runnerVol['inPlayVolume'], 2)
 
-    # find inPlay index for this runner
-    def _find_inPlay_index(self, runnerOdds, inPlayTime):
 
-        counter = 0
-        minCounter = -1
-        for value in runnerOdds['odds']:
-            if value['timestamp'] - inPlayTime >= 0:
-                minCounter = counter
-                break
-            counter = counter + 1
-        return minCounter
+# find inPlay index for this runner
+def _find_inPlay_index(self, runnerOdds, inPlayTime):
+    counter = 0
+    minCounter = -1
+    for value in runnerOdds['odds']:
+        if value['timestamp'] - inPlayTime >= 0:
+            minCounter = counter
+            break
+        counter = counter + 1
+    return minCounter
 ```
 
 

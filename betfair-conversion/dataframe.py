@@ -1,7 +1,3 @@
-# ##
-#  --- IMPORT ---
-# ##
-
 import json
 
 from loguru import logger
@@ -12,14 +8,8 @@ from object.odds import Odds
 from object.runners import Runners
 
 
-# ##
-#  --- FUNCTION ---
-# ##
-
 # read JSON file and save in primary python list
-
-
-def _json_file_to_list(path):
+def jsonFilesToList(path):
     json_lines = []
     try:
         with open(path, encoding='utf-8') as f:
@@ -35,9 +25,9 @@ def _json_file_to_list(path):
 #  --- GET MAIN OBJECT: MARKETS,RUNNERS, PRICE ---
 # ##
 
-# Returns MARKETS in this file
-def _get_markets(path):
-    json_list = _json_file_to_list(path)
+# returns MARKET in this file
+def getMarkets(path):
+    json_list = jsonFilesToList(path)
     markets = []
     clock = ""
     _id = ""
@@ -57,8 +47,8 @@ def _get_markets(path):
 
 
 # Returns RUNNERS in this file
-def _get_runners(path):
-    json_list = _json_file_to_list(path)
+def getRunners(path):
+    json_list = jsonFilesToList(path)
     runners = []
     for entry in json_list:
         mc = entry['mc'][0]
@@ -72,8 +62,8 @@ def _get_runners(path):
 
 
 # Returns PRICE in this file
-def _get_prices_and_runners(path):
-    json_list = _json_file_to_list(path)
+def getPricesAndRunners(path):
+    json_list = jsonFilesToList(path)
     prices = []
     runners = []
     for entry in json_list:
@@ -99,12 +89,12 @@ def _get_prices_and_runners(path):
 # ##
 
 # Returns PANDA dataframe MARKETS in this file
-def get_market_dataframe(path):
+def getMarketDataframe(path):
     try:
-        _markets = _get_markets(path)
+        _markets = getMarkets(path)
         markets = _markets['markets']
         markets_df = (pd.DataFrame.from_records(markets)
-            .assign(publish_time=lambda df: pd.to_datetime(df['clk'], unit='ms')))
+                      .assign(publish_time=lambda df: pd.to_datetime(df['clk'], unit='ms')))
         markets_df = (markets_df.reindex(columns=markets_df.columns.union(["countryCode", "venue"]))
         [['publish_time', 'id', 'eventId', 'marketType', 'openDate', 'status', 'eventName', 'name', 'betDelay',
           'inPlay', 'numberOfActiveRunners', 'version', "countryCode", "venue"]])
@@ -116,9 +106,9 @@ def get_market_dataframe(path):
 
 
 # Returns PANDA dataframe RUNNERS in this file
-def get_runner_dataframe(path):
+def getRunnerDataframe(path):
     try:
-        prices_and_runners = _get_prices_and_runners(path)
+        prices_and_runners = getPricesAndRunners(path)
         runners = prices_and_runners['runners']
 
         runner_ids_df = (pd.DataFrame.from_records(runners)
@@ -136,8 +126,8 @@ def get_runner_dataframe(path):
 
 
 # Returns PANDA dataframe PRICE AND RUNNERS in this file
-def get_prices_dataframe(path, status):
-    prices_and_runners = _get_prices_and_runners(path)
+def getPricesDataframe(path, status):
+    prices_and_runners = getPricesAndRunners(path)
     prices = prices_and_runners['prices']
     runners = prices_and_runners['runners']
     runner_ids_df = (pd.DataFrame.from_records(runners)
@@ -166,12 +156,12 @@ def get_prices_dataframe(path, status):
     return prices_df_long
 
 
-def create_main_dataframe(path, status):
+def createMainDataframe(path, status):
     try:
         main_obj = {
-            'market': get_market_dataframe(path),
-            'runners': get_runner_dataframe(path),
-            'odds': get_prices_dataframe(path, status),
+            'market': getMarketDataframe(path),
+            'runners': getRunnerDataframe(path),
+            'odds': getPricesDataframe(path, status),
         }
         return main_obj
     except Exception as e:
@@ -179,17 +169,8 @@ def create_main_dataframe(path, status):
         raise e
 
 
-def print_dataframe(dataframe):
-    print("MARKET INFO:\n")
-    print(dataframe['market'])
-    print("\nRUNNERS:\n")
-    print(dataframe['runners'])
-    print("\nODDS:\n")
-    print(dataframe['odds'])
-
-
 # get data frame and convert to main object
-def convert_to_obj(dataframe, status: str, sport: str):
+def convertToObj(dataframe, status: str, sport: str):
     # print("Start in converting dataframe to object..")
 
     # convert to dict
@@ -225,8 +206,7 @@ def convert_to_obj(dataframe, status: str, sport: str):
         mainMarket.updateVolume()
 
     # print market info, updates and runners stats
-    #mainMarket.printMarketJSON()
-    #print("\nConverted", mainMarket.info['name'], 'to first version JSON')
-
+    # mainMarket.printMarketJSON()
+    # print("\nConverted", mainMarket.info['name'], 'to first version JSON')
 
     return mainMarket

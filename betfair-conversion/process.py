@@ -9,26 +9,26 @@ from loguru import logger
 from pandas import DataFrame
 import simplejson as json
 
-from dataframe import create_main_dataframe, convert_to_obj
+from dataframe import createMainDataframe, convertToObj
 from paths import PathConfig
 from object.markets import MarketInfo
 from object.runners import RunnersDB
-from sport import get_soccer_matches, get_tennis_matches
-from utils import get_progress
+from sportAdditionalData import get_soccer_matches, get_tennis_matches
+from utils import getProgress
 
 
 # Remove adjacent duplicate rows in market data
-def remove_market_duplicates(market: DataFrame) -> DataFrame:
+def removeMarketDuplicates(market: DataFrame) -> DataFrame:
     duplicate_data = market[["openDate", "status", "betDelay", "inPlay"]]
     return market.loc[(duplicate_data.shift() != duplicate_data).any(axis=1)]
 
 
-def canonize_name(name: str) -> str:
+def canonizeName(name: str) -> str:
     split = name.split()
     return f"{split[-1]}-{name[0]}"
 
 
-def process_json(export_dir: Path, sport_info: tuple, path: Path) -> (Path, str, str, MarketInfo):
+def processJson(export_dir: Path, sport_info: tuple, path: Path) -> (Path, str, str, MarketInfo):
     soccer_matches, tennis_matches = sport_info
 
     status = "BASIC" if "BASIC" in path.parts else "ADVANCED"
@@ -38,9 +38,13 @@ def process_json(export_dir: Path, sport_info: tuple, path: Path) -> (Path, str,
     if market_json_path.exists():
         return basic_info
 
-    frame = create_main_dataframe(path, status)
-    frame["market"] = remove_market_duplicates(frame["market"])
-    obj = convert_to_obj(frame, status, sport)
+    try:
+        frame = createMainDataframe(path, status)
+    except:
+        return basic_info
+
+    frame["market"] = removeMarketDuplicates(frame["market"])
+    obj = convertToObj(frame, status, sport)
     info = obj.info
     if obj.status == "REMOVED":
         return basic_info
@@ -73,8 +77,8 @@ def process_json(export_dir: Path, sport_info: tuple, path: Path) -> (Path, str,
             renamed_obj["additionalInfo"] = soccer_matches[match]
     elif sport == "TENNIS":
         try:
-            winner = canonize_name(next(r for r in obj.runners if r["status"] == "WINNER")["name"])
-            loser = canonize_name(next(r for r in obj.runners if r["status"] == "LOSER")["name"])
+            winner = canonizeName(next(r for r in obj.runners if r["status"] == "WINNER")["name"])
+            loser = canonizeName(next(r for r in obj.runners if r["status"] == "LOSER")["name"])
             match = f"{date}-{winner}-{loser}"
             if match in tennis_matches:
                 renamed_obj["additionalInfo"] = tennis_matches[match]
@@ -91,7 +95,7 @@ def process_json(export_dir: Path, sport_info: tuple, path: Path) -> (Path, str,
     return path, sport, status, obj
 
 
-def process_all_json(json_paths: list[Path]):
+def processAllJson(json_paths: list[Path]):
     logger.info(f"Files to process: {len(json_paths)}")
     process_start = time.perf_counter()
 
@@ -102,19 +106,19 @@ def process_all_json(json_paths: list[Path]):
     json_input = DataFrame(index=["HORSE", "SOCCER", "TENNIS", "OTHER"], columns=["BASIC", "ADVANCED"], dtype="Int64").fillna(0)
     json_output = DataFrame(index=["HORSE", "SOCCER", "TENNIS", "OTHER"], columns=["BASIC", "ADVANCED"], dtype="Int64").fillna(0)
 
-    with get_progress() as progress:
+    with getProgress() as progress:
         task = progress.add_task("JSON Files", total=len(json_paths))
         with Pool(processes=cpu_count()) as pool, Manager() as manager:
             soccer_matches = get_soccer_matches(manager.dict())
             tennis_matches = get_tennis_matches(manager.dict())
 
-            for result in pool.imap(functools.partial(process_json, export_output, (soccer_matches, tennis_matches)), json_paths):
+            for result in pool.imap(functools.partial(processJson, export_output, (soccer_matches, tennis_matches)), json_paths):
                 progress.advance(task)
                 path, sport, status, market = result
                 json_input.at[sport, status] += 1
 
                 if market:
-                    runners_db.save_market(market)
+                    runners_db.saveMarket(market)
                     json_output.at[sport, status] += 1
 
             # Extra statement is needed to prevent hanging context manager.

@@ -2,9 +2,9 @@ import os
 from pathlib import Path
 import shutil
 
-from extract import extract_all_json
+from extract import extractAllJson
 from paths import PathConfig
-from process import process_all_json
+from process import processAllJson
 
 
 def main():
@@ -13,8 +13,8 @@ def main():
 
     raw_data = Path(PathConfig.INPUT_DIR)
     raw_input = Path(PathConfig.WORK_DIR)
-    json_paths = extract_all_json(raw_data, raw_input)
-    process_all_json(json_paths)
+    json_paths = extractAllJson(raw_data, raw_input)
+    processAllJson(json_paths)
     shutil.rmtree(raw_input)
 
 

@@ -95,22 +95,6 @@ class MarketInfo:
 
         self.info['numberOfActiveRunners'] = count
 
-    # return true for tennis spec of runners
-    def _check_tennis(self, runners):
-        for run in runners.runners:
-            if ("The Draw" in str(run[2])) or ("over" in str(run[2])) or ("under" in str(run[2])):
-                return False
-            pass
-        return True
-
-    # return true for football spec of runners
-    def _check_football(self, runners):
-        for run in runners.runners:
-            if "The Draw" in str(run[2]):
-                return True
-            pass
-        return False
-
     # update object filed with passed odds main obj
     def setOdds(self, odds):
         self.odds = odds
@@ -157,7 +141,7 @@ class MarketInfo:
             for odd in odds:
                 if odd['runnerId'] == run['id']:
                     # find inPlay index
-                    inPlayindex = int(self._find_inPlay_index(odd, inPlay))
+                    inPlayindex = int(self.findInPlayIndex(odd, inPlay))
                     if len(odd['odds']) > 0 and inPlayindex > -1:
                         for _odd in odd['odds']:
                             # avg runner prematch odd
@@ -240,25 +224,11 @@ class MarketInfo:
             self.info['volume']['inPlay'] = round(self.info['volume']['inPlay'] +  runnerVol['inPlayVolume'],2)
 
     # find inPlay index for this runner
-    def _find_inPlay_index(self, runnerOdds, inPlayTime):
+    def findInPlayIndex(self, runnerOdds, inPlayTime):
         for (i, value) in enumerate(runnerOdds['odds']):
             if value['timestamp'] - inPlayTime >= 0:
                 return i
         return -1
-
-    # print main market
-    def printMarketJSON(self):
-        print("\n -------- MARKET ---------\n")
-        print("\nMARKET INFO")
-        pprint.pprint(self.info)
-        print("\nMARKET UPDATES")
-        pprint.pprint(self.marketUpdates)
-        print("\nMARKET RUNNERS")
-        pprint.pprint(self.runners)
-        print("\nMARKET ODDS")
-        #pprint.pprint(self.odds)
-
-
 
 # definition of class Market
 class MarketUpdate:

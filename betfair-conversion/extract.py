@@ -6,12 +6,12 @@ import time
 
 from loguru import logger
 
-from utils import get_progress
+from utils import getProgress
 
 
 # Credit for multiprocessing/progress bar code goes to willmcgugan, maintainer of rich:
 # https://github.com/willmcgugan/rich/discussions/884#discussioncomment-269200
-def extract_json(archive_path: Path, json_path: Path) -> list[Path]:
+def extractJson(archive_path: Path, json_path: Path) -> list[Path]:
     json_path.parent.mkdir(parents=True, exist_ok=True)
     with BZ2File(archive_path, "rb") as archive_file, open(json_path, "wb") as json_file:
         data = archive_file.read()
@@ -19,11 +19,11 @@ def extract_json(archive_path: Path, json_path: Path) -> list[Path]:
     return json_path
 
 
-def do_extract_json(params: tuple) -> list[Path]:
-    return extract_json(*params)
+def doExtractJson(params: tuple) -> list[Path]:
+    return extractJson(*params)
 
 
-def extract_all_json(data_path: Path, extract_path: Path) -> list[Path]:
+def extractAllJson(data_path: Path, extract_path: Path) -> list[Path]:
     logger.info("Extracting files...")
     extract_start = time.perf_counter()
 
@@ -47,10 +47,10 @@ def extract_all_json(data_path: Path, extract_path: Path) -> list[Path]:
             to_extract.append((archive_path, json_path))
 
     if to_extract:
-        with get_progress() as progress:
+        with getProgress() as progress:
             task = progress.add_task("BZ2 Files", total=len(to_extract))
             with Pool(processes=cpu_count()) as pool:
-                for json_path in pool.imap(do_extract_json, to_extract):
+                for json_path in pool.imap(doExtractJson, to_extract):
                     json_paths.append(json_path)
                     progress.advance(task)
 

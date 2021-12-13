@@ -139,7 +139,9 @@ dmypy.json
 cython_debug/
 
 
+.idea
 rawInput
+rawData
 exportOutput
 *.xlsx
 *.xlsx
