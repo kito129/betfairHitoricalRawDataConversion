@@ -51,13 +51,18 @@ def processJson(export_dir: Path, sport_info: tuple, path: Path) -> (Path, str, 
     open_date = datetime.fromtimestamp(info["openDate"] / 1000)
     in_play_length = 0
     for runner in obj.runners:
-        in_play_length += runner.get("lengthOddsInPlay", 0)
-    if ((sport == "TENNIS" and (
-            (open_date.year > 2018 and info["delay"] > 5)
-            or (open_date.year < 2018 and info["delay"] > 7))
-    ) or (sport == "SOCCER" and info["delay"] > 7)
+        if runner.get("lengthOddsInPlay"):
+            in_play_length += runner.get("lengthOddsInPlay")
+        if runner.get("status") == "REMOVED":
+            return basic_info
+    # evaluate to add delay == o -> remove
+    if open_date \
+            and ((sport == "TENNIS" and (
+            (open_date.year > 2018 and info["delay"] >= 5)
+            or (open_date.year < 2018 and info["delay"] >= 7)))
+            or (sport == "SOCCER" and info["delay"] >= 7)
             or (sport == "TENNIS" and "/" in info["eventName"])
-            or (sport in ["SOCCER", "TENNIS"] and in_play_length == 0)):
+            or (sport in ["SOCCER", "TENNIS"] and in_play_length < 10)):
         return basic_info
 
     renamed_obj = {
@@ -90,7 +95,7 @@ def processJson(export_dir: Path, sport_info: tuple, path: Path) -> (Path, str, 
 
     market_json_path.parent.mkdir(parents=True, exist_ok=True)
     with open(market_json_path, "w") as market_json_file:
-        json.dump(renamed_obj, market_json_file, indent=4, ignore_nan=True)
+        json.dump(renamed_obj, market_json_file, ignore_nan=True)
 
     return path, sport, status, obj
 

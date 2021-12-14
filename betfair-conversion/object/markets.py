@@ -20,7 +20,7 @@ class MarketInfo:
         # get the last market update with correct openDate
         lastMarketUpdate = obj['data'][-1]
 
-        #convert open date to unix time in ms
+        # convert open date to unix time in ms
         openDate = parse_date(lastMarketUpdate[4])
 
         # volume for ADVANCED
@@ -34,7 +34,8 @@ class MarketInfo:
                 "name": lastMarketUpdate[7],
                 "numberOfActiveRunners": lastMarketUpdate[8],
                 # is not always present but where there i need to copy here
-                "countryCode": lastMarketUpdate[obj["columns"].index("countryCode")] if "countryCode" in obj["columns"] else "",
+                "countryCode": lastMarketUpdate[obj["columns"].index("countryCode")] if "countryCode" in obj[
+                    "columns"] else "",
                 "sport": sport,
                 # is not always present but where there i need to copy here
                 "venue": lastMarketUpdate[obj["columns"].index("venue")] if "venue" in obj["columns"] else "",
@@ -56,7 +57,8 @@ class MarketInfo:
                 "name": lastMarketUpdate[7],
                 "numberOfActiveRunners": lastMarketUpdate[8],
                 # same comment ad advanced
-                "countryCode": lastMarketUpdate[obj["columns"].index("countryCode")] if "countryCode" in obj["columns"] else "",
+                "countryCode": lastMarketUpdate[obj["columns"].index("countryCode")] if "countryCode" in obj[
+                    "columns"] else "",
                 "sport": sport,
                 "venue": lastMarketUpdate[obj["columns"].index("venue")] if "venue" in obj["columns"] else "",
                 # here there aren't info about volume
@@ -105,12 +107,12 @@ class MarketInfo:
     # fix inlay time / error
     def fixUpdates(self):
         # start the routine to fix the openDate (inPlay) error
-        
+
         # the current open time
         inPlayTime = 0
         # find open time for market Update
         for elem in self.marketUpdates:
-            if elem['inPlay'] and elem['status'] == 'OPEN' and elem['betDelay'] > 0 :
+            if elem['inPlay'] and elem['status'] == 'OPEN' and elem['betDelay'] > 0:
                 inPlayTime = int(elem['timestamp'])
                 break
 
@@ -177,7 +179,7 @@ class MarketInfo:
                             stepCounter = stepCounter + 1
                         # avg odds prematch 
                         if contPrematch != 0:
-                            run['avgPrematch'] = round(sumPrematch / contPrematch,2)
+                            run['avgPrematch'] = round(sumPrematch / contPrematch, 2)
                         else:
                             run['avgPrematch'] = 0
                         # closed odds
@@ -219,9 +221,9 @@ class MarketInfo:
     # update total market volume based on runner traded volume
     def updateVolume(self):
         for runnerVol in self.runners:
-            self.info['volume']['total'] = round(self.info['volume']['total'] +  runnerVol['tradedVolume'],2)
-            self.info['volume']['preMatch'] = round(self.info['volume']['preMatch'] +  runnerVol['preMatchVolume'],2)
-            self.info['volume']['inPlay'] = round(self.info['volume']['inPlay'] +  runnerVol['inPlayVolume'],2)
+            self.info['volume']['total'] = round(self.info['volume']['total'] + runnerVol['tradedVolume'], 2)
+            self.info['volume']['preMatch'] = round(self.info['volume']['preMatch'] + runnerVol['preMatchVolume'], 2)
+            self.info['volume']['inPlay'] = round(self.info['volume']['inPlay'] + runnerVol['inPlayVolume'], 2)
 
     # find inPlay index for this runner
     def findInPlayIndex(self, runnerOdds, inPlayTime):
@@ -230,12 +232,12 @@ class MarketInfo:
                 return i
         return -1
 
+
 # definition of class Market
 class MarketUpdate:
 
     # default constructor
     def __init__(self, obj):
-
         self.marketUpdate = []
         updates = obj['data']
 
@@ -248,6 +250,3 @@ class MarketUpdate:
                 "betDelay": up[8],
                 "inPlay": up[9],
             })
-
-
-  
