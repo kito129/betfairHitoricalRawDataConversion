@@ -201,6 +201,9 @@ def convertToObj(dataframe, status: str, sport: str):
     # update updates with odds for the status
     mainMarket.updateRunnersStats()
 
+    # update marketinfo with metadata
+    mainMarket.addMetadata()
+
     # update volume in market info if is ADVANCED
     if status == 'ADVANCED':
         mainMarket.updateVolume()

@@ -3,6 +3,7 @@ from os import PathLike
 import simplejson as json
 
 from .markets import MarketInfo
+import pymongo
 
 
 # ##
@@ -44,11 +45,14 @@ class RunnersDB:
         self.runners = {}
 
     # iterate over runner of this match and check if it's present
-    def saveMarket(self, market: MarketInfo):
+    def saveRunnersDb(self, market: MarketInfo):
         for runner in market.runners:
             runner_id = runner["id"]
             if not self.contains(runner_id):
                 self.runners[runner_id] = {"id": runner["id"], "name": runner["name"], "sport": market.info["sport"]}
+
+
+
 
     # get runner if present, -1 if is not present
     def contains(self, runner_id: int):
@@ -56,4 +60,18 @@ class RunnersDB:
 
     def save(self, path: PathLike):
         with open(path, "w") as runners_file:
-            json.dump(list(self.runners.values()), runners_file, indent=4, ignore_nan=True)
+            json.dump(list(self.runners.values()), runners_file, ignore_nan=True)
+
+        #for runner in self.runners:
+            #saveRunnersInMongo(runner)
+
+
+def saveRunnersInMongo(runner):
+    client = pymongo.MongoClient(
+        "mongodb+srv://marco:4Nr1fD8mAOSypUur@cluster1.fzsll.mongodb.net/bf_historical?retryWrites=true&w=majority")
+    db = client.bf_historical
+
+    # upload in db
+    find = db.runners.find_one({"id": runner['id']})
+    if not find:
+        db.runners.insert_one(runner)

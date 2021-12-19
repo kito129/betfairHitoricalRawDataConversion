@@ -135,6 +135,8 @@ class MarketInfo:
             maxInPlay = -100
             minInPlay = 1001
             found = False
+            inPlayOddsUnder2 = 0
+            inPlayOddsOver2 = 0
 
             # volume for runner
             preMatchVolume = 0
@@ -175,6 +177,12 @@ class MarketInfo:
                                 # check if min inplay
                                 if _odd['ltp'] < minInPlay:
                                     minInPlay = _odd['ltp']
+                                # check if under 2
+                                if _odd['ltp'] < 2:
+                                    inPlayOddsUnder2 += 1
+                                # check if over 2
+                                if _odd['ltp'] > 2:
+                                    inPlayOddsOver2 += 1
                             # increment step counter
                             stepCounter = stepCounter + 1
                         # avg odds prematch 
@@ -195,6 +203,9 @@ class MarketInfo:
                         run['lengthOdds'] = stepCounter
                         run['lengthOddsPrematch'] = contPrematch
                         run['lengthOddsInPlay'] = stepCounter - contPrematch
+                        # odds u/o 2
+                        run['inPlayOddsOver2'] = inPlayOddsOver2
+                        run['inPlayOddsUnder2'] = inPlayOddsUnder2
                         # volume for ADVANCED
                         if self.status == 'ADVANCED':
                             run['tradedVolume'] = round(odd['odds'][len(odd['odds']) - 1]['tv'], 2)
@@ -231,6 +242,62 @@ class MarketInfo:
             if value['timestamp'] - inPlayTime >= 0:
                 return i
         return -1
+
+    # add metadeta to market info
+    def addMetadata(self):
+
+        tempSuspended = []
+        tempClosed = []
+        updateAfterInplay = []
+        for update in self.marketUpdates:
+            if update["betDelay"] > 0 and update["status"] == "SUSPENDED":
+                tempSuspended.append(update)
+            if update["status"] == "CLOSED":
+                tempClosed.append(update)
+            if update["betDelay"] > 0 and update['inPlay'] is True:
+                updateAfterInplay.append(update)
+
+        suspendTime = tempSuspended[len(tempSuspended) - 1]["timestamp"] if (
+                    len(tempSuspended) and tempSuspended[len(tempSuspended) - 1]) else 0
+        closeTime = tempClosed[len(tempClosed) - 1]["timestamp"] if tempClosed[len(tempClosed) - 1] else 0
+        checkSuspendTimeIsLast = False
+
+        openTime = self.info["openDate"]
+
+        for idx, val in enumerate(self.marketUpdates):
+            update = self.marketUpdates[idx]
+            if update['status'] == "SUSPENDED" and self.marketUpdates[idx + 1]['status'] == "CLOSED":
+                checkSuspendTimeIsLast = True
+
+        runnersCorrectBSP = 0
+        runnersPrematchNumberOdds = 0
+        runnersInPlayNumberOdds = 0
+        try:
+            for runner in self.runners:
+                if runner['status'] != 'REMOVED':
+                    runnersPrematchNumberOdds += runner['lengthOddsPrematch']
+                    runnersInPlayNumberOdds += runner['lengthOddsInPlay']
+                    runnersCorrectBSP = runnersCorrectBSP + (1 if runner['inPlayTime'] == openTime else 0)
+        except KeyError:
+            runnersCorrectBSP = 0
+            runnersPrematchNumberOdds = 0
+            runnersInPlayNumberOdds = 0
+
+        self.info["metadata"] = {
+            "inPlayTime": openTime,
+            "suspendTime": suspendTime if suspendTime > 0 else 0,
+            "inplaySuspendUpdatesNumber": len(tempSuspended),
+            "closeTime": closeTime if closeTime > 0 else 0,
+            "correctSuspended": not (not suspendTime),
+            "inPlayDuration": suspendTime - openTime if (
+                    suspendTime > 0 and suspendTime > openTime and checkSuspendTimeIsLast) else closeTime - openTime if closeTime > 0 else 0,
+            "haveAdditionalInfo": False,
+            "runnersCorrectBSP": runnersCorrectBSP,
+            "prematchNumberOddsNumber": runnersPrematchNumberOdds,
+            "inplayNumberOddsNumber": runnersInPlayNumberOdds,
+            "inplayUpdatesNumber": len(updateAfterInplay),
+            "inplayUpdates": updateAfterInplay,
+        }
 
 
 # definition of class Market

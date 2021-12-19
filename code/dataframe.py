@@ -4,7 +4,7 @@
 
 import pandas as pd
 import json
-from tabulate import tabulate
+
 
 
 # ##
