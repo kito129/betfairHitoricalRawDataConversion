@@ -109,8 +109,8 @@ def processJson(export_dir: Path, sport_info: tuple, path: Path) -> (Path, str, 
     with open(market_json_path, "w") as market_json_file:
         json.dump(renamed_obj, market_json_file, ignore_nan=True)
 
-    # upload in DB
-    #upload(renamed_obj)
+    #upload in DB
+    upload(renamed_obj)
 
     return path, sport, status, obj
 

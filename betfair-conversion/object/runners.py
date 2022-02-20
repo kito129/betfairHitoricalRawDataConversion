@@ -62,8 +62,8 @@ class RunnersDB:
         with open(path, "w") as runners_file:
             json.dump(list(self.runners.values()), runners_file, ignore_nan=True)
 
-        #for runner in self.runners:
-            #saveRunnersInMongo(runner)
+        for runner in self.runners:
+            saveRunnersInMongo(runner)
 
 
 def saveRunnersInMongo(runner):
