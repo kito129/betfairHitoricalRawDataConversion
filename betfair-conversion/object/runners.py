@@ -51,9 +51,6 @@ class RunnersDB:
             if not self.contains(runner_id):
                 self.runners[runner_id] = {"id": runner["id"], "name": runner["name"], "sport": market.info["sport"]}
 
-
-
-
     # get runner if present, -1 if is not present
     def contains(self, runner_id: int):
         return runner_id in self.runners
@@ -62,7 +59,8 @@ class RunnersDB:
         with open(path, "w") as runners_file:
             json.dump(list(self.runners.values()), runners_file, ignore_nan=True)
 
-        for runner in self.runners:
+        #upload in mongo db
+        for runner in self.runners.values():
             saveRunnersInMongo(runner)
 
 
@@ -72,5 +70,7 @@ def saveRunnersInMongo(runner):
     db = client.bf_historical
 
     # upload in db
+    runnerId = runner["id"]
+    find = db.runners.find_one({"id": runnerId})
     if not find:
         db.runners.insert_one(runner)
