@@ -72,6 +72,5 @@ def saveRunnersInMongo(runner):
     db = client.bf_historical
 
     # upload in db
-    find = db.runners.find_one({"id": runner['id']})
     if not find:
         db.runners.insert_one(runner)
