@@ -143,5 +143,3 @@ cython_debug/
 rawInput
 rawData
 exportOutput
-*.xlsx
-*.xlsx
